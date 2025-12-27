@@ -1,0 +1,47 @@
+web: {
+  resource: {
+    templates
+    static: {
+      styles
+      scripts
+    }
+  }
+}
+
+cmd: {
+  server: {
+    main
+  }
+}
+
+internal: {
+  resource: {
+    infra: {
+      controller
+      renderer
+      repository
+    }
+
+    domain: {
+      entity
+      repository
+      renderer
+      use-case
+    }
+  }
+}
+
+internal.resource.domain.entity -> internal.resource.domain.repository
+internal.resource.domain.repository -> internal.resource.domain.use-case
+internal.resource.domain.renderer -> internal.resource.domain.use-case
+
+internal.resource.infra.controller -> internal.resource.domain.use-case
+
+internal.resource.infra.renderer -> internal.resource.domain.renderer
+internal.resource.infra.renderer -> web.resource.templates
+
+internal.resource.infra.repository -> internal.resource.domain.repository
+
+cmd.server.main -> internal.resource.infra.controller
+cmd.server.main -> internal.resource.infra.repository: initialization
+cmd.server.main -> internal.resource.infra.renderer: initialization

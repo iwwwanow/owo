@@ -1,0 +1,27 @@
+web: {
+  templates
+  static: {
+    styles
+    scripts
+  }
+}
+
+cmd: {
+  main
+}
+
+internal: {
+  controller
+  use-case
+  renderer
+  repository
+}
+
+cmd.main -> internal.controller
+
+internal.controller -> internal.use-case
+
+internal.use-case -> internal.repository
+internal.use-case -> internal.renderer
+
+internal.renderer -> web.templates
