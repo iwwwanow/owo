@@ -1,4 +1,4 @@
-module github.com/iwwwanow/owwo
+module github.com/iwwwanow/owo
 
 go 1.24.0
 

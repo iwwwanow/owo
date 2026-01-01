@@ -3,19 +3,20 @@ package main
 import (
 	"net/http"
 
-	"github.com/iwwwanow/owwo/internal/configs"
-	"github.com/iwwwanow/owwo/internal/handlers"
-	"github.com/iwwwanow/owwo/internal/utils"
+	"github.com/iwwwanow/owo/internal"
 )
 
 func main() {
 
-	port := utils.GetServerPort()
-	tmpl := utils.GetTemplateInstance()
+	repository := internal.NewRepository()
+	renderer := internal.NewRenderer()
+	handler := internal.NewHandler(*renderer, *repository)
+	controller := internal.NewController(*handler)
 
-	http.HandleFunc("/", handlers.ResouceHandler(tmpl))
-	http.Handle("/static/", http.StripPrefix("/static/", handlers.StaticHandler(configs.StaticDir)))
-	http.Handle("/public/", http.StripPrefix("/public/", handlers.StaticHandler(configs.PublicDir)))
+	port := internal.GetServerPort()
+	// tmpl := internal.GetTemplateInstance()
 
-	utils.LaunchServer(port)
+	http.HandleFunc("/", controller.ProcessRequest())
+
+	internal.LaunchServer(port)
 }
