@@ -11,7 +11,7 @@ services:
       - PORT=8080
       - TZ=Europe/Moscow
     command: air -c .air.toml
-  owwo_image:
+  owo_image:
     build:
       context: .
       dockerfile: Dockerfile
