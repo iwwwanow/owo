@@ -12,16 +12,16 @@ cmd: {
 
 internal: {
   controller
-  use-case
+  handler
   renderer
   repository
 }
 
 cmd.main -> internal.controller
 
-internal.controller -> internal.use-case
+internal.controller -> internal.handler
 
-internal.use-case -> internal.repository
-internal.use-case -> internal.renderer
+internal.handler -> internal.repository
+internal.handler -> internal.renderer
 
 internal.renderer -> web.templates
