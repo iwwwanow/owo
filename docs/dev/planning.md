@@ -1,3 +1,6 @@
+- [ ] static handler & static repository
+- [ ] repository refactor - it has todos
+
 - [ ] перебрать весь бэклог
   - нужно разделить все фичи по категориям:
     - настройки конфига
