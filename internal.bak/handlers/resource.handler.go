@@ -87,7 +87,7 @@ func ResouceHandler(tmpl *template.Template) http.HandlerFunc {
 					}
 				}
 
-				resources = append(resources, childResource)
+				// resources = append(resources, childResource)
 			}
 			// }
 		} else {
@@ -98,14 +98,14 @@ func ResouceHandler(tmpl *template.Template) http.HandlerFunc {
 		}
 
 		// TODO base title on domainname
-		pageData.Title = "iwwwanowwwwwww"
-		pageData.Resource = resource
-		pageData.Resources = resources
-
-		err = tmpl.Execute(w, pageData)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		// pageData.Title = "iwwwanowwwwwww"
+		// pageData.Resource = resource
+		// pageData.Resources = resources
+		//
+		// err = tmpl.Execute(w, pageData)
+		// if err != nil {
+		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 	return
+		// }
 	}
 }
