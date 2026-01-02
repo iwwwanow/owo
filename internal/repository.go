@@ -1,8 +1,5 @@
 package internal
 
-// # работа с данными на сервере
-// # основное мясо будет здесь
-
 import (
 	"os"
 	"path/filepath"
@@ -50,17 +47,16 @@ type ResourceData struct {
 	FullPath string
 	Name     string
 	Type     string
-	Content  string
-	Preview  string
+	// Content  string
+	// Preview  string
 }
 
 func NewRepository() *Repository {
 	return &Repository{}
 }
 
-func (repository *Repository) GetResourceData(resourcePath string, reqursive bool, parentResouceData *ResourceData) (ResourceData, []ResourceData) {
+func (repository *Repository) GetResourceData(resourcePath string) ResourceData {
 	var resourceData ResourceData
-	var childResourcesData []ResourceData
 	// TODO: publicdirpath
 	resourceData.FullPath = filepath.Join("publicdirpath", resourcePath)
 
@@ -68,65 +64,41 @@ func (repository *Repository) GetResourceData(resourcePath string, reqursive boo
 	if err != nil {
 		// TODO: 404 exception
 		// http.NotFound(w, r)
-		return
+		return resourceData
 	}
 
 	resourceData.Path = resourcePath
 	resourceData.Name = resourceFileInfo.Name()
 	resourceData.Type = getFileType(resourceData.Name, resourceFileInfo)
 
-	if reqursive {
-		switch resourceData.Type {
-		case fileTypeDir:
-			childResourcesData = getDirectoryData(repository, &resourceData)
-		default:
-			prepareResourceData(&resourceData)
-		}
-	}
-
-	if !reqursive {
-		switch resourceData.Type {
-		// TODO: переделай. все превью. вся работа на превью будет через meta
-		case fileTypeText:
-			resourceData.Preview = setResourcePreview(&resourceData)
-		case fileTypeOther:
-			resourceData.Preview = setResourcePreview(&resourceData)
-		case fileTypeDir:
-			setDirectoryPreview(parentResouceData, &resourceData)
-		default:
-			prepareResourceData(&resourceData)
-		}
-	}
-
-	return resourceData, childResourcesData
+	return resourceData
 }
 
-func getDirectoryData(repository *Repository, resourceData *ResourceData) []ResourceData {
-	var resourcesData []ResourceData
+func (repository *Repository) GetResourceMeta(resourceData *ResourceData) MetaData {
+	var meta MetaData
 
-	// TODO: git pull
-	// utils.GitPullIfNeeded(resourceFullPath)
+	switch resourceData.Type {
+	case fileTypeText:
+		setResourceMetaDescription(resourceData, &meta)
+	case fileTypeOther:
+		setResourceMetaDescription(resourceData, &meta)
+	case fileTypeDir:
+		setDirectoryMeta(resourceData, &meta)
+	default:
+		setDirectoryMeta(resourceData, &meta)
+	}
 
+	return meta
+}
+
+func (repository *Repository) GetChildResourceDirs(resourceData *ResourceData) []os.DirEntry {
 	files, err := os.ReadDir(resourceData.FullPath)
 	if err != nil {
 		// TODO: если нет дочерних файлов в директории. что делать?
 		// return
 	}
 
-	for _, childFile := range files {
-		childResourcePath := filepath.Join(resourceData.Path, childFile.Name())
-		childResourceData, _ := repository.GetResourceData(childResourcePath, false, resourceData)
-		resourcesData = append(resourcesData, childResourceData)
-	}
-
-	return resourcesData
-}
-
-func prepareResourceData(resourceData *ResourceData) {
-	content, err := os.ReadFile(resourceData.FullPath)
-	if err == nil {
-		resourceData.Content = string(content)
-	}
+	return files
 }
 
 func getFileType(filename string, info os.FileInfo) string {
@@ -147,50 +119,43 @@ func getFileType(filename string, info os.FileInfo) string {
 	}
 }
 
-func setResourcePreview(resourceData *ResourceData) string {
+func setResourceMetaDescription(resourceData *ResourceData, meta *MetaData) {
 	content, err := os.ReadFile(resourceData.FullPath)
-	preview := string(content)
+	description := string(content)
 
 	if err == nil {
-		// TODO: move it logic into renderer
-		if len(preview) > PreviewMaxLength {
-			preview = preview[:PreviewMaxLength] + "..."
-		}
-
+		meta.Description = description
 	}
-
-	resourceData.Meta.Description = preview
 }
 
-func setDirectoryPreview(parentResourceData *ResourceData, childResourceData *ResourceData) {
-	switch childResourceData.Name {
-	// TODO: refactor
-	case MetaDirName:
-		metaDirPath := childResourceData.FullPath
+func setDirectoryMeta(resourceData *ResourceData, meta *MetaData) {
+	metaDirPath := filepath.Join(resourceData.Path, MetaHtmlName)
+	metaDirFullPath := filepath.Join(resourceData.FullPath, MetaHtmlName)
 
-		htmlPath := filepath.Join(metaDirPath, MetaHtmlName)
+	if _, err := os.Stat(metaDirFullPath); err == nil {
+		htmlPath := filepath.Join(metaDirFullPath, MetaHtmlName)
 		if _, err := os.Stat(htmlPath); err == nil {
-			parentResourceData.Meta.HtmlPath = filepath.Join(childResourceData.Path, MetaHtmlName)
+			meta.HtmlPath = filepath.Join(metaDirPath, MetaHtmlName)
 		}
 
-		cssPath := filepath.Join(metaDirPath, MetaCssName)
+		cssPath := filepath.Join(metaDirFullPath, MetaCssName)
 		if _, err := os.Stat(cssPath); err == nil {
-			parentResourceData.Meta.CssPath = filepath.Join(childResourceData.Path, MetaCssName)
+			meta.CssPath = filepath.Join(metaDirPath, MetaCssName)
 		}
 
-		jsPath := filepath.Join(metaDirPath, MetaJsName)
+		jsPath := filepath.Join(metaDirFullPath, MetaJsName)
 		if _, err := os.Stat(jsPath); err == nil {
-			parentResourceData.Meta.JsPath = filepath.Join(childResourceData.Path, MetaJsName)
+			meta.JsPath = filepath.Join(metaDirPath, MetaJsName)
 		}
 
-		mdPath := filepath.Join(metaDirPath, MetaMdName)
+		mdPath := filepath.Join(metaDirFullPath, MetaMdName)
 		if _, err := os.Stat(mdPath); err == nil {
-			parentResourceData.Meta.MdPath = filepath.Join(childResourceData.Path, MetaMdName)
+			meta.MdPath = filepath.Join(metaDirPath, MetaMdName)
 		}
-	default:
-		coverPath := findCoverForResource(childResourceData.Path, childResourceData.FullPath)
+
+		coverPath := findCoverForResource(resourceData.Path, resourceData.FullPath)
 		if coverPath != "" {
-			childResourceData.Meta.CoverPath = coverPath
+			meta.CoverPath = coverPath
 		}
 	}
 }

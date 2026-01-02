@@ -4,15 +4,15 @@ package internal
 // # работа с шаблонами. логика подготовки данных из renderer для шаблона
 
 import (
+	"fmt"
 	"html/template"
 )
 
-type Renderer struct {
-}
+type Renderer struct{}
 
-type ResourcePageData struct {
+type ResourcePageProps struct {
 	Title     string
-	Meta      ResourceMetaData
+	Meta      MetaData
 	Resource  ResourceData
 	Resources []ResourceData
 }
@@ -23,6 +23,7 @@ func NewRenderer() *Renderer {
 
 // TODO: is html needed?
 func (renderer *Renderer) RenderResourcePage() template.HTML {
+	fmt.Print("log on renderer")
 	return "resource page"
 }
 

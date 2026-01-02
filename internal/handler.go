@@ -2,6 +2,8 @@ package internal
 
 import (
 	"fmt"
+	"html/template"
+	"path/filepath"
 )
 
 // # основная логика приложения
@@ -20,9 +22,30 @@ func NewHandler(renderer Renderer, repository Repository) *Handler {
 	}
 }
 
-func (handler *Handler) HandleResource(requestPath string) {
-	fmt.Printf("log on handler: %s", requestPath)
-	fmt.Println()
+func (handler *Handler) HandleResource(requestPath string) template.HTML {
+	resourcePath := requestPath
+
+	var resourceData ResourceData
+	var childResourcesData []ResourceData
+
+	// TODO: git pull
+	// utils.GitPullIfNeeded(resourceFullPath)
+
+	resourceData = handler.repository.GetResourceData(resourcePath)
+	resourceData.Meta = handler.repository.GetResourceMeta(&resourceData)
+
+	childResourceDirs := handler.repository.GetChildResourceDirs(&resourceData)
+	for _, childResourceDir := range childResourceDirs {
+		childResourcePath := filepath.Join(resourceData.Path, childResourceDir.Name())
+		var childResourceData ResourceData
+
+		childResourceData = handler.repository.GetResourceData(childResourcePath)
+		childResourceData.Meta = handler.repository.GetResourceMeta(&childResourceData)
+
+		childResourcesData = append(childResourcesData, childResourceData)
+	}
+
+	return handler.renderer.RenderResourcePage()
 }
 
 func (handler *Handler) HandleStatic(requestPath string) {
