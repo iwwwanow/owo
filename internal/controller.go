@@ -29,11 +29,16 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 
 func (controller *Controller) handleResourceRoute(res http.ResponseWriter, req *http.Request, requestPath string) {
 
-	resourcePage := controller.handler.HandleResource(requestPath)
+	htmlContent, err := controller.handler.HandleResource(requestPath)
 
-	res.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	res.Header().Set("Content-Type", "text/html; charset=utf-8")
 	res.WriteHeader(http.StatusOK)
-	res.Write([]byte("Hello from: " + resourcePage))
+	res.Write([]byte(htmlContent))
 }
 
 func (controller *Controller) handleStaticRoute(res http.ResponseWriter, req *http.Request, requestPath string) {

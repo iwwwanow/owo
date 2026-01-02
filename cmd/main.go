@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/iwwwanow/owo/internal"
@@ -9,12 +10,15 @@ import (
 func main() {
 
 	repository := internal.NewRepository()
-	renderer := internal.NewRenderer()
+	renderer, err := internal.NewRenderer()
+	if err != nil {
+		fmt.Printf("Renderer not initialized")
+		return
+	}
 	handler := internal.NewHandler(*renderer, *repository)
 	controller := internal.NewController(*handler)
 
 	port := internal.GetServerPort()
-	// tmpl := internal.GetTemplateInstance()
 
 	http.HandleFunc("/", controller.ProcessRequest())
 

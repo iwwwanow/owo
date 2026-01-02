@@ -22,7 +22,7 @@ func NewHandler(renderer Renderer, repository Repository) *Handler {
 	}
 }
 
-func (handler *Handler) HandleResource(requestPath string) template.HTML {
+func (handler *Handler) HandleResource(requestPath string) (template.HTML, error) {
 	resourcePath := requestPath
 
 	var resourceData ResourceData
@@ -32,7 +32,7 @@ func (handler *Handler) HandleResource(requestPath string) template.HTML {
 	// utils.GitPullIfNeeded(resourceFullPath)
 
 	resourceData = handler.repository.GetResourceData(resourcePath)
-	resourceData.Meta = handler.repository.GetResourceMeta(&resourceData)
+	resourceMetaData := handler.repository.GetResourceMeta(&resourceData)
 
 	childResourceDirs := handler.repository.GetChildResourceDirs(&resourceData)
 	for _, childResourceDir := range childResourceDirs {
@@ -45,7 +45,14 @@ func (handler *Handler) HandleResource(requestPath string) template.HTML {
 		childResourcesData = append(childResourcesData, childResourceData)
 	}
 
-	return handler.renderer.RenderResourcePage()
+	var props ResourcePageProps
+	// TODO: title logic
+	props.Title = "resource-page-title"
+	props.Meta = resourceMetaData
+	props.Resource = resourceData
+	props.Resources = childResourcesData
+
+	return handler.renderer.RenderResourcePage(&props)
 }
 
 func (handler *Handler) HandleStatic(requestPath string) {

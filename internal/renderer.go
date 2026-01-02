@@ -4,11 +4,19 @@ package internal
 // # работа с шаблонами. логика подготовки данных из renderer для шаблона
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
+	"path/filepath"
 )
 
-type Renderer struct{}
+const (
+	templatesDir = "web/templates"
+)
+
+type Renderer struct {
+	templates map[string]*template.Template
+}
 
 type ResourcePageProps struct {
 	Title     string
@@ -17,21 +25,54 @@ type ResourcePageProps struct {
 	Resources []ResourceData
 }
 
-func NewRenderer() *Renderer {
-	return &Renderer{}
+func NewRenderer() (*Renderer, error) {
+	renderer := &Renderer{
+		templates: make(map[string]*template.Template),
+	}
+
+	// Загружаем все шаблоны
+	pattern := filepath.Join(templatesDir, "*.html")
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range files {
+		fmt.Printf(file)
+		name := filepath.Base(file)
+		tmpl, err := template.ParseFiles(file)
+		if err != nil {
+			return nil, err
+		}
+		renderer.templates[name] = tmpl
+	}
+
+	return renderer, nil
 }
 
 // TODO: is html needed?
-func (renderer *Renderer) RenderResourcePage() template.HTML {
-	fmt.Print("log on renderer")
-	return "resource page"
+func (renderer *Renderer) RenderResourcePage(props *ResourcePageProps) (template.HTML, error) {
+	fmt.Println("log on renderer")
+
+	tmpl := GetTemplateInstance()
+	// tmpl, exists := renderer.templates["index.html"]
+	// if !exists {
+	// 	return "", fmt.Errorf("template 'index.html' not found")
+	// }
+
+	// Создаем буфер для результата
+	var buf bytes.Buffer
+
+	// Исполняем шаблон
+	err := tmpl.Execute(&buf, props)
+	if err != nil {
+		return "", err
+	}
+
+	// Конвертируем в template.HTML для безопасной вставки
+	return template.HTML(buf.String()), nil
 }
 
-// // TODO: base title on domainname
-// pageData.Title = "iwwwanowwwwwww"
-// pageData.Resource = resource
-// pageData.Resources = resources
-//
 // err = tmpl.Execute(w, pageData)
 // if err != nil {
 // 	http.Error(w, err.Error(), http.StatusInternalServerError)

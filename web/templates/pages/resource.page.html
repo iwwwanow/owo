@@ -1,18 +1,7 @@
 {{ define "resource_page" }}
 
-<head>
-	{{ template "head_fragment" . }}
-</head>
 <body>
-	<div class="wrapper">
-		{{ template "header_fragment" . }}
-		{{ template "content_fragment" . }}
-		{{ template "footer_fragment" . }}
-	</div>
-
-	{{ if .Meta.JsPath }}
-	<script defer src="/public/{{ .Meta.JsPath }}"></script>
-	{{end}}
+  <h1>resource page</h1>
 </body>
 
 {{ end }}
