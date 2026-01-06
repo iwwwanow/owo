@@ -22,27 +22,33 @@ const (
 )
 
 const (
-	MetaHtmlName  = "index.html"
-	MetaMdName    = "index.md"
-	MetaCssName   = "index.css"
-	MetaJsName    = "index.js"
-	MetaCoverName = "cover"
+	StaticHtmlName  = "index.html"
+	StaticMdName    = "index.md"
+	StaticCssName   = "index.css"
+	StaticJsName    = "index.js"
+	StaticCoverName = "cover"
 )
 
-type Repository struct{}
+type Repository struct {
+}
 
 type MetaData struct {
-	HtmlPath    string
-	CssPath     string
-	JsPath      string
-	MdPath      string
-	CoverPath   string
+	Title       string
 	Description string
+}
+
+type StaticData struct {
+	HtmlPath  string
+	MdPath    string
+	CssPath   string
+	JsPath    string
+	CoverPath string
 }
 
 type ResourceData struct {
 	// TODO: why caps?
 	Meta     MetaData
+	Static   StaticData
 	Path     string
 	FullPath string
 	Name     string
@@ -55,8 +61,7 @@ func NewRepository() *Repository {
 	return &Repository{}
 }
 
-func (repository *Repository) GetResourceData(resourcePath string) ResourceData {
-	var resourceData ResourceData
+func (repository *Repository) SetResourceData(resourcePath string, resourceData *ResourceData) {
 	// TODO: publicdirpath
 	resourceData.FullPath = filepath.Join("publicdirpath", resourcePath)
 
@@ -64,41 +69,59 @@ func (repository *Repository) GetResourceData(resourcePath string) ResourceData 
 	if err != nil {
 		// TODO: 404 exception
 		// http.NotFound(w, r)
-		return resourceData
+		return
 	}
 
 	resourceData.Path = resourcePath
 	resourceData.Name = resourceFileInfo.Name()
 	resourceData.Type = getFileType(resourceData.Name, resourceFileInfo)
-
-	return resourceData
 }
 
-func (repository *Repository) GetResourceMeta(resourceData *ResourceData) MetaData {
-	var meta MetaData
+func (repository *Repository) SetResourceStaticData(resourceData *ResourceData, resourceStaticData *StaticData) {
+
+	switch resourceData.Type {
+	// case fileTypeText:
+	// 	setResourceMetaDescription(resourceData, &resourceStaticData)
+	// case fileTypeOther:
+	// 	setResourceMetaDescription(resourceData, &resourceStaticData)
+	case fileTypeDir:
+		setDirectoryStatic(resourceData, resourceStaticData)
+	default:
+		setDirectoryStatic(resourceData, resourceStaticData)
+	}
+}
+
+func (repository *Repository) SetResourceMetaData(resourceData *ResourceData, resourceMetaData *MetaData) {
 
 	switch resourceData.Type {
 	case fileTypeText:
-		setResourceMetaDescription(resourceData, &meta)
+		setResourceMetaDescription(resourceData, resourceMetaData)
 	case fileTypeOther:
-		setResourceMetaDescription(resourceData, &meta)
-	case fileTypeDir:
-		setDirectoryMeta(resourceData, &meta)
-	default:
-		setDirectoryMeta(resourceData, &meta)
+		setResourceMetaDescription(resourceData, resourceMetaData)
+		// case fileTypeDir:
+		// 	setDirectoryStatic(resourceData, resourceStaticData)
+		// default:
+		// 	setDirectoryStatic(resourceData, resourceStaticData)
 	}
-
-	return meta
 }
 
-func (repository *Repository) GetChildResourceDirs(resourceData *ResourceData) []os.DirEntry {
-	files, err := os.ReadDir(resourceData.FullPath)
+func (repository *Repository) SetChildResourcesData(resourceData *ResourceData, childResourcesData *[]ResourceData) {
+	childResourceDirs, err := os.ReadDir(resourceData.FullPath)
 	if err != nil {
 		// TODO: если нет дочерних файлов в директории. что делать?
 		// return
 	}
 
-	return files
+	for _, childResourceDir := range childResourceDirs {
+		childResourcePath := filepath.Join(resourceData.Path, childResourceDir.Name())
+		var childResourceData ResourceData
+
+		repository.SetResourceData(childResourcePath, &childResourceData)
+		repository.SetResourceMetaData(&childResourceData, &childResourceData.Meta)
+		repository.SetResourceStaticData(&childResourceData, &childResourceData.Static)
+
+		*childResourcesData = append(*childResourcesData, childResourceData)
+	}
 }
 
 func getFileType(filename string, info os.FileInfo) string {
@@ -128,34 +151,34 @@ func setResourceMetaDescription(resourceData *ResourceData, meta *MetaData) {
 	}
 }
 
-func setDirectoryMeta(resourceData *ResourceData, meta *MetaData) {
-	metaDirPath := filepath.Join(resourceData.Path, MetaHtmlName)
-	metaDirFullPath := filepath.Join(resourceData.FullPath, MetaHtmlName)
+func setDirectoryStatic(resourceData *ResourceData, static *StaticData) {
+	metaDirPath := filepath.Join(resourceData.Path, StaticHtmlName)
+	metaDirFullPath := filepath.Join(resourceData.FullPath, StaticHtmlName)
 
 	if _, err := os.Stat(metaDirFullPath); err == nil {
-		htmlPath := filepath.Join(metaDirFullPath, MetaHtmlName)
+		htmlPath := filepath.Join(metaDirFullPath, StaticHtmlName)
 		if _, err := os.Stat(htmlPath); err == nil {
-			meta.HtmlPath = filepath.Join(metaDirPath, MetaHtmlName)
+			static.HtmlPath = filepath.Join(metaDirPath, StaticHtmlName)
 		}
 
-		cssPath := filepath.Join(metaDirFullPath, MetaCssName)
+		cssPath := filepath.Join(metaDirFullPath, StaticCssName)
 		if _, err := os.Stat(cssPath); err == nil {
-			meta.CssPath = filepath.Join(metaDirPath, MetaCssName)
+			static.CssPath = filepath.Join(metaDirPath, StaticCssName)
 		}
 
-		jsPath := filepath.Join(metaDirFullPath, MetaJsName)
+		jsPath := filepath.Join(metaDirFullPath, StaticJsName)
 		if _, err := os.Stat(jsPath); err == nil {
-			meta.JsPath = filepath.Join(metaDirPath, MetaJsName)
+			static.JsPath = filepath.Join(metaDirPath, StaticJsName)
 		}
 
-		mdPath := filepath.Join(metaDirFullPath, MetaMdName)
+		mdPath := filepath.Join(metaDirFullPath, StaticMdName)
 		if _, err := os.Stat(mdPath); err == nil {
-			meta.MdPath = filepath.Join(metaDirPath, MetaMdName)
+			static.MdPath = filepath.Join(metaDirPath, StaticMdName)
 		}
 
 		coverPath := findCoverForResource(resourceData.Path, resourceData.FullPath)
 		if coverPath != "" {
-			meta.CoverPath = coverPath
+			static.CoverPath = coverPath
 		}
 	}
 }
@@ -171,9 +194,9 @@ func findCoverForResource(resourcePath, resourceFullPath string) string {
 	coverExtensions := []string{".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
 
 	for _, ext := range coverExtensions {
-		coverPath := filepath.Join(metaDirPath, MetaCoverName+ext)
+		coverPath := filepath.Join(metaDirPath, StaticCoverName+ext)
 		if _, err := os.Stat(coverPath); err == nil {
-			return filepath.Join(resourcePath, MetaDirName, MetaCoverName+ext)
+			return filepath.Join(resourcePath, MetaDirName, StaticCoverName+ext)
 		}
 	}
 

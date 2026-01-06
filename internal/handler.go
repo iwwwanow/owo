@@ -3,7 +3,7 @@ package internal
 import (
 	"fmt"
 	"html/template"
-	"path/filepath"
+	// "path/filepath"
 )
 
 // # основная логика приложения
@@ -31,28 +31,25 @@ func (handler *Handler) HandleResource(requestPath string) (template.HTML, error
 	// TODO: git pull
 	// utils.GitPullIfNeeded(resourceFullPath)
 
-	resourceData = handler.repository.GetResourceData(resourcePath)
-	resourceMetaData := handler.repository.GetResourceMeta(&resourceData)
+	handler.repository.SetResourceData(resourcePath, &resourceData)
+	handler.repository.SetResourceStaticData(&resourceData, &resourceData.Static)
+	handler.repository.SetResourceMetaData(&resourceData, &resourceData.Meta)
 
-	childResourceDirs := handler.repository.GetChildResourceDirs(&resourceData)
-	for _, childResourceDir := range childResourceDirs {
-		childResourcePath := filepath.Join(resourceData.Path, childResourceDir.Name())
-		var childResourceData ResourceData
+	fmt.Println("resourceData:")
+	fmt.Print(resourceData)
 
-		childResourceData = handler.repository.GetResourceData(childResourcePath)
-		childResourceData.Meta = handler.repository.GetResourceMeta(&childResourceData)
-
-		childResourcesData = append(childResourcesData, childResourceData)
-	}
+	handler.setChildResourcesData(&resourceData, &childResourcesData)
 
 	var props ResourcePageProps
 	// TODO: title logic
 	props.Title = "resource-page-title"
-	props.Meta = resourceMetaData
 	props.Resource = resourceData
 	props.Resources = childResourcesData
 
 	return handler.renderer.RenderResourcePage(&props)
+}
+
+func (handler *Handler) setChildResourcesData(resourceData *ResourceData, childResourcesData *[]ResourceData) {
 }
 
 func (handler *Handler) HandleStatic(requestPath string) {
