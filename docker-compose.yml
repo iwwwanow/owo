@@ -4,7 +4,8 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
-      - /media/ubuntu-operator/7fff58c3-3e1f-4c91-8ef4-0aabb30c27f1/Documents/backups/owo:/var/www/owwo/shared
+      - ./test/uploads:/var/www/owo/shared/uploads
+      - ./web/static:/var/www/owo/shared/static
     ports:
       - "8080:8080"
     environment:
