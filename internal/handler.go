@@ -1,9 +1,7 @@
 package internal
 
 import (
-	"fmt"
 	"html/template"
-	// "path/filepath"
 )
 
 // # основная логика приложения
@@ -35,24 +33,18 @@ func (handler *Handler) HandleResource(requestPath string) (template.HTML, error
 	handler.repository.SetResourceStaticData(&resourceData, &resourceData.Static)
 	handler.repository.SetResourceMetaData(&resourceData, &resourceData.Meta)
 
-	fmt.Println("resourceData:")
-	fmt.Print(resourceData)
-
-	handler.setChildResourcesData(&resourceData, &childResourcesData)
+	handler.repository.SetChildResourcesData(&resourceData, &childResourcesData)
 
 	var props ResourcePageProps
 	// TODO: title logic
-	props.Title = "resource-page-title"
+	// props.Title = "resource-page-title"
 	props.Resource = resourceData
 	props.Resources = childResourcesData
 
 	return handler.renderer.RenderResourcePage(&props)
 }
 
-func (handler *Handler) setChildResourcesData(resourceData *ResourceData, childResourcesData *[]ResourceData) {
-}
-
-func (handler *Handler) HandleStatic(requestPath string) {
-	fmt.Printf("log on handle static: %s", requestPath)
-	fmt.Println()
+func (handler *Handler) HandleStatic(requestPath string) StaticFileData {
+	staticFileData := handler.repository.GetStaticFileData(requestPath)
+	return staticFileData
 }

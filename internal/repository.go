@@ -15,8 +15,8 @@ const (
 
 const (
 	// TODO env
-	PublicDir        = "/var/www/owwo/shared"
-	StaticDir        = "web/static"
+	UploadsDir       = "/var/www/owo/shared/uploads"
+	StaticDir        = "/var/www/owo/shared/static"
 	MetaDirName      = ".meta"
 	PreviewMaxLength = 50
 )
@@ -29,8 +29,7 @@ const (
 	StaticCoverName = "cover"
 )
 
-type Repository struct {
-}
+type Repository struct{}
 
 type MetaData struct {
 	Title       string
@@ -45,6 +44,11 @@ type StaticData struct {
 	CoverPath string
 }
 
+type StaticFileData struct {
+	Ext  string
+	Path string
+}
+
 type ResourceData struct {
 	// TODO: why caps?
 	Meta     MetaData
@@ -53,7 +57,7 @@ type ResourceData struct {
 	FullPath string
 	Name     string
 	Type     string
-	// Content  string
+	// TODO: fill it on renderer
 	// Preview  string
 }
 
@@ -63,7 +67,7 @@ func NewRepository() *Repository {
 
 func (repository *Repository) SetResourceData(resourcePath string, resourceData *ResourceData) {
 	// TODO: publicdirpath
-	resourceData.FullPath = filepath.Join("publicdirpath", resourcePath)
+	resourceData.FullPath = filepath.Join(UploadsDir, resourcePath)
 
 	resourceFileInfo, err := os.Stat(resourceData.FullPath)
 	if err != nil {
@@ -77,22 +81,26 @@ func (repository *Repository) SetResourceData(resourcePath string, resourceData 
 	resourceData.Type = getFileType(resourceData.Name, resourceFileInfo)
 }
 
-func (repository *Repository) SetResourceStaticData(resourceData *ResourceData, resourceStaticData *StaticData) {
-
+func (repository *Repository) SetResourceStaticData(
+	resourceData *ResourceData,
+	resourceStaticData *StaticData,
+) {
 	switch resourceData.Type {
 	// case fileTypeText:
 	// 	setResourceMetaDescription(resourceData, &resourceStaticData)
 	// case fileTypeOther:
 	// 	setResourceMetaDescription(resourceData, &resourceStaticData)
 	case fileTypeDir:
-		setDirectoryStatic(resourceData, resourceStaticData)
+		setDirectoryStaticData(resourceData, resourceStaticData)
 	default:
-		setDirectoryStatic(resourceData, resourceStaticData)
+		setDirectoryStaticData(resourceData, resourceStaticData)
 	}
 }
 
-func (repository *Repository) SetResourceMetaData(resourceData *ResourceData, resourceMetaData *MetaData) {
-
+func (repository *Repository) SetResourceMetaData(
+	resourceData *ResourceData,
+	resourceMetaData *MetaData,
+) {
 	switch resourceData.Type {
 	case fileTypeText:
 		setResourceMetaDescription(resourceData, resourceMetaData)
@@ -105,7 +113,10 @@ func (repository *Repository) SetResourceMetaData(resourceData *ResourceData, re
 	}
 }
 
-func (repository *Repository) SetChildResourcesData(resourceData *ResourceData, childResourcesData *[]ResourceData) {
+func (repository *Repository) SetChildResourcesData(
+	resourceData *ResourceData,
+	childResourcesData *[]ResourceData,
+) {
 	childResourceDirs, err := os.ReadDir(resourceData.FullPath)
 	if err != nil {
 		// TODO: если нет дочерних файлов в директории. что делать?
@@ -125,7 +136,6 @@ func (repository *Repository) SetChildResourcesData(resourceData *ResourceData, 
 }
 
 func getFileType(filename string, info os.FileInfo) string {
-
 	if info.IsDir() {
 		return fileTypeDir
 	}
@@ -142,6 +152,18 @@ func getFileType(filename string, info os.FileInfo) string {
 	}
 }
 
+func (repository *Repository) GetStaticFileData(resourcePath string) StaticFileData {
+	var staticFileData StaticFileData
+	staticFileFullPath := filepath.Join(StaticDir, filepath.Clean(resourcePath))
+
+	ext := filepath.Ext(staticFileFullPath)
+
+	staticFileData.Path = staticFileFullPath
+	staticFileData.Ext = ext
+
+	return staticFileData
+}
+
 func setResourceMetaDescription(resourceData *ResourceData, meta *MetaData) {
 	content, err := os.ReadFile(resourceData.FullPath)
 	description := string(content)
@@ -151,7 +173,7 @@ func setResourceMetaDescription(resourceData *ResourceData, meta *MetaData) {
 	}
 }
 
-func setDirectoryStatic(resourceData *ResourceData, static *StaticData) {
+func setDirectoryStaticData(resourceData *ResourceData, static *StaticData) {
 	metaDirPath := filepath.Join(resourceData.Path, StaticHtmlName)
 	metaDirFullPath := filepath.Join(resourceData.FullPath, StaticHtmlName)
 
