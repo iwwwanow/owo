@@ -1,0 +1,21 @@
+{{ define "content_fragment" }}
+  {{ if .Resource.Static.HtmlPath }}
+    {{ template "iframe-content_component" .Resource.Static.HtmlPath }}
+  {{ end }}
+
+  {{ if .Resource.Static.MdPath }}
+    {{ template "markdown-content_component" .Resource.Static.MdPath }}
+  {{ end }}
+
+  {{ if .Resource }}
+    {{ template "resource-content_component" .Resource }}
+  {{ end }}
+
+  {{ if .Resources }}
+    <div class="grid">
+      {{ range .Resources }}
+        {{ template "resource-card_component" . }}
+      {{ end }}
+    </div>
+  {{ end }}
+{{ end }}

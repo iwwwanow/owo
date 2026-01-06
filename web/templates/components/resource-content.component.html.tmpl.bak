@@ -1,0 +1,11 @@
+{{ define "resource-content_component" }}
+  <div class="grid">
+    <div class="grid__right-content">
+      {{ if eq .Type "image" }}
+        {{ template "resource-content_image_component" .Path }}
+      {{ else }}
+        {{ template "resource-content_other_component" .Content }}
+      {{ end }}
+    </div>
+  </div>
+{{ end }}

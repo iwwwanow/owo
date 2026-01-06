@@ -1,0 +1,12 @@
+{{ define "resource_page" }}
+  <head>
+    {{ template "head_fragment" .Resource }}
+  </head>
+
+  <body>
+    <div class="wrapper">
+      {{ template "header_fragment" .Resource }}
+      {{ template "content_fragment" . }}
+    </div>
+  </body>
+{{ end }}
