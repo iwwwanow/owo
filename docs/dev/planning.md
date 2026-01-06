@@ -1,5 +1,46 @@
-- [ ] static handler & static repository
-- [ ] repository refactor - it has todos
+- [ ] header with desc
+- [ ] footer with desc
+- [ ] fix qureyparam ?static to ?upload to serve files from uploads
+- [ ] mapper on handler layer
+  - pageProps:
+
+  ```go
+  // pass to renderer only needed values
+
+  type PageData struct {
+      title string // from resource name (file or directory)
+      description string // from .meta
+      html string // is needed?
+      css string
+      js string
+      cover string
+  }
+
+  type ResourceData struct {
+      type string // use consts
+
+      // if image - prerender it to html as string
+      // if md or html - prerender it to html as string
+      content string
+  }
+
+  type ResourcesData struct {
+      title string // filename or dirname
+      description string // prerender it from html or md
+      cover string // .meta/cover
+  }
+
+  type PageProps struct {
+      page PageData
+      resource ResourceData
+      resources []ResourcesData
+  }
+  ```
+
+---
+
+- [x] static handler & static repository
+- [x] repository refactor - it has todos
 
 - [ ] перебрать весь бэклог
   - нужно разделить все фичи по категориям:
