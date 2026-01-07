@@ -1,3 +1,5 @@
+- [ ] ssh fixes
+- [ ] clean project; todo to backlog
 - [x] template namings
 - [x] md renderer
 
