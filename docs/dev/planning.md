@@ -1,5 +1,13 @@
-- [ ] ssh fixes
-- [ ] clean project; todo to backlog
+- [ ] push image on github
+- [ ] pull on host. by auto-updater-image (google it)
+- [ ] github curl to owo to setup app
+- [ ] github curl to infra to launch all apps
+- [ ] v1 and versioning
+
+---
+
+- [x] ssh fixes
+- [x] clean project; todo to backlog
 - [x] template namings
 - [x] md renderer
 
