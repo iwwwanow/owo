@@ -26,7 +26,7 @@
   user-select: none;
 
   color: var(--DARK);
-  mix-blend-mode: luminosity;
+  /* mix-blend-mode: luminosity; */
 }
 
 .card__text-header {

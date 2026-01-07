@@ -1,9 +1,7 @@
 {{ define "iframe-content_component" }}
-
-<div class="grid">
-	<div class="grid__right-content">
-		<iframe src="/public/{{ . }}" frameborder="0"></iframe>
-	</div>
-</div>
-
+  <div class="grid">
+    <div class="grid__right-content">
+      <iframe src="{{ . }}?static" frameborder="0"></iframe>
+    </div>
+  </div>
 {{ end }}

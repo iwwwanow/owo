@@ -4,6 +4,7 @@ package internal
 // подгготовка отвера для reponse
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -21,24 +22,32 @@ func NewController(handler Handler) *Controller {
 
 func (controller *Controller) ProcessRequest() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
+		hostName := req.Host
 		requestPath := strings.TrimPrefix(req.URL.Path, "/")
 
-		if req.URL.Query().Get("static") != "" {
-			controller.handleStaticRoute(res, req, requestPath)
+		if req.URL.Query().Has("static") {
+			fmt.Println("handle static")
+			controller.handleStaticRoute(res, req, UploadsDir, requestPath)
 			return
 		}
 
 		if strings.HasPrefix(requestPath, "static/") {
-			controller.handleStaticRoute(res, req, strings.TrimPrefix(requestPath, "static/"))
+			controller.handleStaticRoute(
+				res,
+				req,
+				StaticDir,
+				strings.TrimPrefix(requestPath, "static/"),
+			)
 			return
 		}
 
-		if isStaticFile(requestPath) {
-			controller.handleStaticRoute(res, req, requestPath)
-			return
-		}
+		// TODO: is it correct?
+		// if isStaticFile(requestPath) {
+		// 	controller.handleStaticRoute(res, req, UploadsDir, requestPath)
+		// 	return
+		// }
 
-		controller.handleResourceRoute(res, req, requestPath)
+		controller.handleResourceRoute(res, req, requestPath, hostName)
 	}
 }
 
@@ -46,8 +55,9 @@ func (controller *Controller) handleResourceRoute(
 	res http.ResponseWriter,
 	req *http.Request,
 	requestPath string,
+	hostName string,
 ) {
-	htmlContent, err := controller.handler.HandleResource(requestPath)
+	htmlContent, err := controller.handler.HandleResource(requestPath, hostName)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
@@ -61,9 +71,10 @@ func (controller *Controller) handleResourceRoute(
 func (controller *Controller) handleStaticRoute(
 	res http.ResponseWriter,
 	req *http.Request,
+	staticPath string,
 	requestPath string,
 ) {
-	staticFileData := controller.handler.HandleStatic(requestPath)
+	staticFileData := controller.handler.HandleStatic(staticPath, requestPath)
 
 	if _, err := os.Stat(staticFileData.Path); os.IsNotExist(err) {
 		http.NotFound(res, req)

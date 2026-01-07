@@ -1,37 +1,51 @@
-{{define "head_fragment"}}
+{{ define "head_fragment" }}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#e0e0e0" />
 
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#e0e0e0" />
-<title>{{.Meta.Title}}</title>
-<link rel="stylesheet" href="/static/css/index.css" />
+  <title>{{ .Title }}</title>
+  {{ if .Description }}
+    <meta name="description" content="{{ .Description }}" />
+  {{ end }}
 
-<link rel="icon" href="/static/favicon/black/favicon.ico" type="image/x-icon" />
-<link
-  rel="shortcut icon"
-  href="/static/favicon/black/favicon.ico"
-  type="image/x-icon"
-/>
-<link
-  rel="icon"
-  type="image/png"
-  sizes="32x32"
-  href="/static/favicon/black/favicon-32x32.png"
-/>
-<link
-  rel="icon"
-  type="image/png"
-  sizes="16x16"
-  href="/static/favicon/black/favicon-16x16.png"
-/>
-<link
-  rel="apple-touch-icon"
-  sizes="180x180"
-  href="/static/favicon/black/apple-touch-icon.png"
-/>
-<link rel="icon" type="image/svg+xml" href="/static/favicon/blak/favicon.svg" />
-<link rel="manifest" href="/static/favicon/black/site.webmanifest" />
 
-{{ if .Static.CssPath }}
-<link rel="stylesheet" href="{{ .Static.CssPath }}?static" />
-{{end}} {{end}}
+  <link rel="stylesheet" href="/static/css/index.css" />
+
+  <link
+    rel="icon"
+    href="/static/favicon/black/favicon.ico"
+    type="image/x-icon"
+  />
+  <link
+    rel="shortcut icon"
+    href="/static/favicon/black/favicon.ico"
+    type="image/x-icon"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="32x32"
+    href="/static/favicon/black/favicon-32x32.png"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="16x16"
+    href="/static/favicon/black/favicon-16x16.png"
+  />
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="/static/favicon/black/apple-touch-icon.png"
+  />
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="/static/favicon/blak/favicon.svg"
+  />
+  <link rel="manifest" href="/static/favicon/black/site.webmanifest" />
+
+  {{ if .Css }}
+    <link rel="stylesheet" href="{{ .Css }}?static" />
+  {{ end }}
+{{ end }}

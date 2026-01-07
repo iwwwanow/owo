@@ -1,0 +1,11 @@
+{{ define "horizontal_ruler" }}
+  {{ if . }}
+    <fieldset class="hr_fieldset">
+      <legend>
+        <h6>{{ . }}</h6>
+      </legend>
+    </fieldset>
+  {{ else }}
+    <hr text="footer" />
+  {{ end }}
+{{ end }}

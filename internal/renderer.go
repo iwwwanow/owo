@@ -18,11 +18,40 @@ type Renderer struct {
 	templates map[string]*template.Template
 }
 
+type HeaderProps struct {
+	Title string
+}
+
+type PageProps struct {
+	Title       string // from resource name (file or directory)
+	Description string // from .meta
+	Html        string // is needed?
+	Css         string
+	Js          string
+	Cover       string
+}
+
+type ResourceProps struct {
+	Type string // use consts // iframe, image, html
+
+	// if image - prerender it to html as string
+	// if md or html - prerender it to html as string
+	ContentPath string
+	HtmlContent string
+}
+
+type ChildResourceProps struct {
+	Path        string
+	Title       string // filename or dirname
+	Description string // prerender it from html or md
+	Cover       string // .meta/cover
+}
+
 type ResourcePageProps struct {
-	Title     string
-	Meta      MetaData
-	Resource  ResourceData
-	Resources []ResourceData
+	Header    HeaderProps
+	Page      PageProps
+	Resource  ResourceProps
+	Resources []ChildResourceProps
 }
 
 func NewRenderer() (*Renderer, error) {

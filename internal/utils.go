@@ -21,10 +21,11 @@ var templates = []string{
 
 	"web/templates/components/resource-card.component.html.tmpl",
 	"web/templates/components/iframe-content.component.html.tmpl",
-	"web/templates/components/markdown-content.component.html.tmpl",
+	"web/templates/components/html-content.component.html.tmpl",
 	"web/templates/components/resource-content.component.html.tmpl",
 	"web/templates/components/resource-content_image.component.html.tmpl",
 	"web/templates/components/resource-content_other.component.html.tmpl",
+	"web/templates/components/horizontal-ruler.component.html.tmpl",
 }
 
 func GetServerPort() int {

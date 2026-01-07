@@ -1,5 +1,14 @@
-hr {
+hr,
+.hr_fieldset {
+  grid-column: 1/ -1;
+  padding-left: var(--GRID-GAP-2);
   margin: 12px 0 4px;
   border-top: 1px solid var(--LIGHT);
   color: var(--MEDIUM);
+}
+.hr_fieldset legend {
+  padding: 0 4px;
+}
+.hr_fieldset legend * {
+  text-transform: lowercase !important;
 }

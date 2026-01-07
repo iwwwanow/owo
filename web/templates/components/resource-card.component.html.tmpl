@@ -1,12 +1,12 @@
 {{ define "resource-card_component" }}
   <a class="card__wrapper border_light" href="/{{ .Path }}">
-    {{ if eq .Type "image" }}
+    {{ if .Cover }}
       <picture class="card__cover-container">
         <!-- TODO -->
         <!-- <source srcset={imageWidth190px2xSource} media="(max-width: 360px)" /> -->
         <!-- <source srcset={image2xSrcset} /> -->
         <img
-          src="/public/{{ .Path }}"
+          src="/{{ .Cover }}?static"
           class="card__img"
           alt="page card cover"
         />
@@ -15,7 +15,7 @@
 
 
     <div class="card__text-container">
-      <h4 class="card__text-header">{{ .Name }}</h4>
+      <h4 class="card__text-header">{{ .Title }}</h4>
     </div>
   </a>
 {{ end }}

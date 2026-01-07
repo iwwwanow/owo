@@ -3,6 +3,7 @@ package internal
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -42,6 +43,7 @@ type StaticData struct {
 	CssPath   string
 	JsPath    string
 	CoverPath string
+	Content   string
 }
 
 type StaticFileData struct {
@@ -88,12 +90,12 @@ func (repository *Repository) SetResourceStaticData(
 	switch resourceData.Type {
 	// case fileTypeText:
 	// 	setResourceMetaDescription(resourceData, &resourceStaticData)
-	// case fileTypeOther:
-	// 	setResourceMetaDescription(resourceData, &resourceStaticData)
+	case fileTypeImage:
+		setImageStaticData(resourceData, resourceStaticData)
 	case fileTypeDir:
 		setDirectoryStaticData(resourceData, resourceStaticData)
 	default:
-		setDirectoryStaticData(resourceData, resourceStaticData)
+		setOtherStaticData(resourceData, resourceStaticData)
 	}
 }
 
@@ -152,9 +154,12 @@ func getFileType(filename string, info os.FileInfo) string {
 	}
 }
 
-func (repository *Repository) GetStaticFileData(resourcePath string) StaticFileData {
+func (repository *Repository) GetStaticFileData(
+	staticDir string,
+	resourcePath string,
+) StaticFileData {
 	var staticFileData StaticFileData
-	staticFileFullPath := filepath.Join(StaticDir, filepath.Clean(resourcePath))
+	staticFileFullPath := filepath.Join(staticDir, filepath.Clean(resourcePath))
 
 	ext := filepath.Ext(staticFileFullPath)
 
@@ -173,9 +178,23 @@ func setResourceMetaDescription(resourceData *ResourceData, meta *MetaData) {
 	}
 }
 
+func setImageStaticData(resourceData *ResourceData, static *StaticData) {
+	static.CoverPath = resourceData.Path
+}
+
+func setOtherStaticData(resourceData *ResourceData, static *StaticData) {
+	content, err := os.ReadFile(resourceData.FullPath)
+	if err != nil {
+		// Обработка ошибки чтения файла
+		static.Content = ""
+		return
+	}
+	static.Content = string(content)
+}
+
 func setDirectoryStaticData(resourceData *ResourceData, static *StaticData) {
-	metaDirPath := filepath.Join(resourceData.Path, StaticHtmlName)
-	metaDirFullPath := filepath.Join(resourceData.FullPath, StaticHtmlName)
+	metaDirPath := filepath.Join(resourceData.Path, MetaDirName)
+	metaDirFullPath := filepath.Join(resourceData.FullPath, MetaDirName)
 
 	if _, err := os.Stat(metaDirFullPath); err == nil {
 		htmlPath := filepath.Join(metaDirFullPath, StaticHtmlName)
@@ -198,27 +217,42 @@ func setDirectoryStaticData(resourceData *ResourceData, static *StaticData) {
 			static.MdPath = filepath.Join(metaDirPath, StaticMdName)
 		}
 
-		coverPath := findCoverForResource(resourceData.Path, resourceData.FullPath)
+		coverPath := findDirectoryCover(resourceData.Path, resourceData.FullPath)
 		if coverPath != "" {
 			static.CoverPath = coverPath
 		}
 	}
 }
 
-// TODO: refactor
-func findCoverForResource(resourcePath, resourceFullPath string) string {
+func findDirectoryCover(resourcePath, resourceFullPath string) string {
 	metaDirPath := filepath.Join(resourceFullPath, MetaDirName)
 
 	if _, err := os.Stat(metaDirPath); err != nil {
 		return ""
 	}
 
-	coverExtensions := []string{".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
+	files, err := os.ReadDir(metaDirPath)
+	if err != nil {
+		return ""
+	}
 
-	for _, ext := range coverExtensions {
-		coverPath := filepath.Join(metaDirPath, StaticCoverName+ext)
-		if _, err := os.Stat(coverPath); err == nil {
-			return filepath.Join(resourcePath, MetaDirName, StaticCoverName+ext)
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		fileName := strings.ToLower(file.Name())
+
+		if !strings.HasPrefix(fileName, strings.ToLower(StaticCoverName)) {
+			continue
+		}
+
+		// Проверяем расширение
+		ext := filepath.Ext(fileName)
+		validExts := []string{".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
+
+		if slices.Contains(validExts, ext) {
+			return filepath.Join(resourcePath, MetaDirName, file.Name())
 		}
 	}
 

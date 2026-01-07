@@ -1,12 +1,17 @@
 {{ define "resource_page" }}
   <head>
-    {{ template "head_fragment" .Resource }}
+    {{ template "head_fragment" .Page }}
   </head>
 
   <body>
     <div class="wrapper">
-      {{ template "header_fragment" .Resource }}
+      {{ template "header_fragment" .Header }}
       {{ template "content_fragment" . }}
+      {{ template "footer_fragment" . }}
     </div>
+
+    {{ if .Page.Js }}
+      <script defer src="{{ .Page.Js }}?static"></script>
+    {{ end }}
   </body>
 {{ end }}

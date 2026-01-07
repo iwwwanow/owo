@@ -1,6 +1,10 @@
-- [ ] header with desc
-- [ ] footer with desc
-- [ ] fix qureyparam ?static to ?upload to serve files from uploads
+- [ ] hide hidden
+
+---
+
+- [x] header with desc
+- [x] footer with desc
+- [x] fix qureyparam ?static to ?upload to serve files from uploads
 - [ ] mapper on handler layer
   - pageProps:
 
