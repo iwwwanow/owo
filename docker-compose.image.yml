@@ -2,10 +2,11 @@ services:
   owo:
     image: owo:latest
     volumes:
-      - ./test/uploads:/var/www/owo/uploads
-      - ./test/authorized_keys:/root/.ssh/authorized_keys
-      - ./docker/ssh/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key
-      - ./docker/ssh/ssh_host_rsa_key.pub:/etc/ssh/ssh_host_rsa_key.pub
+      - ./owo/uploads:/var/www/owo/uploads
+
+      - ./owo/authorized_keys:/root/.ssh/authorized_keys
+      - ./owo/ssh_keys/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key
+      - ./owo/ssh_keys/ssh_host_rsa_key.pub:/etc/ssh/ssh_host_rsa_key.pub
     ports:
       - "8080:8080"
       - "2222:22"
