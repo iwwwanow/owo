@@ -7,6 +7,7 @@ services:
       - ./web/templates:/var/www/owo/templates
     ports:
       - "8080:8080"
+      - "2222:22"
     environment:
       - PORT=8080
       - TZ=Europe/Moscow
