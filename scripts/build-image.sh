@@ -1,1 +1,1 @@
-docker build . -t owo
+docker build . --no-cache -t owo
