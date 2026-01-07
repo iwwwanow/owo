@@ -4,6 +4,6 @@
   {{ else if eq .Type "image" }}
     {{ template "resource-content_image_component" .ContentPath }}
   {{ else }}
-    {{ template "resource-content_other_component" .HtmlContent }}
+    {{ template "resource-content_other_component" .Content }}
   {{ end }}
 {{ end }}

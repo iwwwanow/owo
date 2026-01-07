@@ -37,7 +37,8 @@ type ResourceProps struct {
 	// if image - prerender it to html as string
 	// if md or html - prerender it to html as string
 	ContentPath string
-	HtmlContent string
+	HtmlContent template.HTML
+	Content     string
 }
 
 type ChildResourceProps struct {
@@ -106,22 +107,6 @@ func (renderer *Renderer) RenderResourcePage(props *ResourcePageProps) (template
 // if err != nil {
 // 	http.Error(w, err.Error(), http.StatusInternalServerError)
 // 	return
-// }
-
-// TODO: to renderer
-// func convertMDToHTML(mdContent []byte) template.HTML {
-// 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
-// 	p := parser.NewWithExtensions(extensions)
-//
-// 	doc := p.Parse(mdContent)
-//
-// 	htmlFlags := html.CommonFlags | html.HrefTargetBlank
-// 	opts := html.RendererOptions{Flags: htmlFlags}
-// 	renderer := html.NewRenderer(opts)
-//
-// 	htmlContent := markdown.Render(doc, renderer)
-//
-// 	return template.HTML(htmlContent)
 // }
 
 // // TODO: to renderer

@@ -1,7 +1,14 @@
 package internal
 
 import (
+	"fmt"
 	"html/template"
+	"os"
+	"path/filepath"
+
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 )
 
 // # основная логика приложения
@@ -63,11 +70,22 @@ func mapDataToProps(
 	props.Page.Js = resourceData.Static.JsPath
 	props.Page.Cover = resourceData.Static.CoverPath
 
+	// TODO: для контента, возможно, имеет смысл добавить отдельный объект. нужно перебрать его и на уровне шаблонов
 	props.Resource.Type = resourceData.Type
 	// TODO:
-	props.Resource.HtmlContent = resourceData.Static.Content
+	props.Resource.Content = resourceData.Static.Content
 	if props.Resource.Type == fileTypeImage {
 		props.Resource.ContentPath = resourceData.Path
+	}
+	// TODO: renderer
+	if resourceData.Static.MdPath != "" {
+		// TODO: contentType?
+		props.Resource.Type = "html"
+		mdFullPath := filepath.Join(UploadsDir, resourceData.Static.MdPath)
+		content, err := os.ReadFile(mdFullPath)
+		if err == nil {
+			props.Resource.HtmlContent = convertMDToHTML(content)
+		}
 	}
 
 	if props.Resources == nil {
@@ -86,4 +104,21 @@ func mapDataToProps(
 			props.Resources = append(props.Resources, childResourceProps)
 		}
 	}
+}
+
+// TODO: to renderer
+func convertMDToHTML(mdContent []byte) template.HTML {
+	fmt.Println("convertMDToHTML")
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extensions)
+
+	doc := p.Parse(mdContent)
+
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+
+	htmlContent := markdown.Render(doc, renderer)
+
+	return template.HTML(htmlContent)
 }

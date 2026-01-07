@@ -3,7 +3,7 @@
     {{ template "iframe-content_component" .Page.Html }}
   {{ end }}
 
-  {{ if or .Resource.HtmlContent .Resource.ContentPath }}
+  {{ if or .Resource.HtmlContent .Resource.ContentPath .Resource.Content }}
     <div class="grid">
       <div class="grid__right-content">
         {{ template "resource-content_component" .Resource }}
