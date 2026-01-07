@@ -19,6 +19,13 @@ COPY --from=builder /server /app/server
 COPY --from=builder /app/web/static /var/www/owo/static
 COPY --from=builder /app/web/templates /var/www/owo/templates
 
+# Копируем entrypoint
+COPY --from=builder /app/scripts/docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# TODO: Опционально: дефолтный authorized_keys
+# COPY docker/authorized_keys.default /authorized_keys.default
+
 COPY configs/sshd_config /etc/ssh/sshd_config
 # COPY authorized_keys /root/.ssh/authorized_keys
 
@@ -31,6 +38,8 @@ ENV PORT=8080 \
 	TZ=Europe/Moscow \
 	PUBLIC_DIR=/var/www/owwo/shared
 
-VOLUME ["/var/www/owwo/shared"]
+# TODO: for what?
+# VOLUME ["/var/www/owo/shared"]
 
-CMD ["sh", "-c", "/usr/sbin/sshd -D & /app/server"]
+# CMD ["sh", "-c", "/usr/sbin/sshd -D & /app/server"]
+ENTRYPOINT ["/entrypoint.sh"]
