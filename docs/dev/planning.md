@@ -1,4 +1,4 @@
-- [ ] template namings
+- [x] template namings
 - [x] md renderer
 
 ---

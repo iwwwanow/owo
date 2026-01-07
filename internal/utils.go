@@ -19,13 +19,12 @@ var templates = []string{
 	"web/templates/fragments/content.fragment.html.tmpl",
 	"web/templates/fragments/footer.fragment.html.tmpl",
 
-	"web/templates/components/resource-card.component.html.tmpl",
-	"web/templates/components/iframe-content.component.html.tmpl",
-	"web/templates/components/html-content.component.html.tmpl",
-	"web/templates/components/resource-content.component.html.tmpl",
-	"web/templates/components/resource-content_image.component.html.tmpl",
-	"web/templates/components/resource-content_other.component.html.tmpl",
-	"web/templates/components/horizontal-ruler.component.html.tmpl",
+	"web/templates/components/card.component.html.tmpl",
+	"web/templates/components/iframe.component.html.tmpl",
+	"web/templates/components/html.component.html.tmpl",
+	"web/templates/components/image.component.html.tmpl",
+	"web/templates/components/code.component.html.tmpl",
+	"web/templates/components/hr.component.html.tmpl",
 }
 
 func GetServerPort() int {

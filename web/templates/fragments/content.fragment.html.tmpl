@@ -1,22 +1,28 @@
 {{ define "content_fragment" }}
   {{ if .Page.Html }}
-    {{ template "iframe-content_component" .Page.Html }}
+    {{ template "iframe" .Page.Html }}
   {{ end }}
 
   {{ if or .Resource.HtmlContent .Resource.ContentPath .Resource.Content }}
     <div class="grid">
       <div class="grid__right-content">
-        {{ template "resource-content_component" .Resource }}
+        {{ if eq .Resource.Type "html" }}
+          {{ template "html" .Resource.HtmlContent }}
+        {{ else if eq .Resource.Type "image" }}
+          {{ template "image" .Resource.ContentPath }}
+        {{ else }}
+          {{ template "code" .Resource.Content }}
+        {{ end }}
       </div>
     </div>
   {{ end }}
 
   {{ if .Resources }}
     <div class="grid">
-      {{ template "horizontal_ruler" "resources" }}
+      {{ template "hr" "resources" }}
 
       {{ range .Resources }}
-        {{ template "resource-card_component" . }}
+        {{ template "card" . }}
       {{ end }}
     </div>
   {{ end }}

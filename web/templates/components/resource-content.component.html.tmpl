@@ -1,9 +1,0 @@
-{{ define "resource-content_component" }}
-  {{ if eq .Type "html" }}
-    {{ template "html-content_component" .HtmlContent }}
-  {{ else if eq .Type "image" }}
-    {{ template "resource-content_image_component" .ContentPath }}
-  {{ else }}
-    {{ template "resource-content_other_component" .Content }}
-  {{ end }}
-{{ end }}
