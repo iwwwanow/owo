@@ -2,7 +2,7 @@ FROM golang:1.24.6 AS builder
 WORKDIR /app
 COPY . .
 RUN go mod download
-RUN CGO_ENABLED=0 go build -o /server ./cmd/server/main.go
+RUN CGO_ENABLED=0 go build -o /server ./cmd/main.go
 
 FROM alpine:3.22.1
 WORKDIR /app
@@ -19,11 +19,11 @@ COPY --from=builder /server /app/server
 COPY --from=builder /app/web/static /app/static
 COPY --from=builder /app/web/templates /app/templates
 
-COPY sshd_config /etc/ssh/sshd_config
-COPY authorized_keys /root/.ssh/authorized_keys
+COPY configs/sshd_config /etc/ssh/sshd_config
+# COPY authorized_keys /root/.ssh/authorized_keys
 
-RUN chmod 600 /root/.ssh/authorized_keys \
-	&& chmod 600 /etc/ssh/sshd_config
+# RUN chmod 600 /root/.ssh/authorized_keys
+RUN chmod 600 /etc/ssh/sshd_config
 
 EXPOSE 22 8080
 

@@ -1,0 +1,12 @@
+services:
+  owo:
+    image: owo:latest
+    volumes:
+      - ./test/uploads:/var/www/owo/uploads
+      - ./web/static:/var/www/owo/static
+      - ./web/templates:/var/www/owo/templates
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - TZ=Europe/Moscow

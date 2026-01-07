@@ -16,8 +16,8 @@ const (
 
 const (
 	// TODO env
-	UploadsDir       = "/var/www/owo/shared/uploads"
-	StaticDir        = "/var/www/owo/shared/static"
+	UploadsDir       = "/var/www/owo/uploads"
+	StaticDir        = "/var/www/owo/static"
 	MetaDirName      = ".meta"
 	PreviewMaxLength = 50
 )

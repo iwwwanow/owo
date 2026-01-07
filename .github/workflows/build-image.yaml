@@ -1,4 +1,4 @@
-name: Deploy
+name: Build image
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build and push site docker image
+      - name: Build docker image
         env:
           REPOSITORY: ${{ github.repository }}
           REPOSITORY_OWNER: ${{ github.repository_owner }}
@@ -34,5 +34,5 @@ jobs:
 
           docker build --no-cache -t $image_name -t $image_name_latest --quiet .
 
-          docker push $image_name --quiet
-          docker push $image_name_latest --quiet
+          # docker push $image_name --quiet
+          # docker push $image_name_latest --quiet

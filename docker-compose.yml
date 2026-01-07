@@ -4,8 +4,9 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
-      - ./test/uploads:/var/www/owo/shared/uploads
-      - ./web/static:/var/www/owo/shared/static
+      - ./test/uploads:/var/www/owo/uploads
+      - ./web/static:/var/www/owo/static
+      - ./web/templates:/var/www/owo/templates
     ports:
       - "8080:8080"
     environment:

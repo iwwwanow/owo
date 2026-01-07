@@ -11,20 +11,20 @@ import (
 // TODO: refactor
 
 var templates = []string{
-	"web/templates/index.html.tmpl",
-	"web/templates/pages/resource.page.html.tmpl",
+	"/var/www/owo/templates/index.html.tmpl",
+	"/var/www/owo/templates/pages/resource.page.html.tmpl",
 
-	"web/templates/fragments/head.fragment.html.tmpl",
-	"web/templates/fragments/header.fragment.html.tmpl",
-	"web/templates/fragments/content.fragment.html.tmpl",
-	"web/templates/fragments/footer.fragment.html.tmpl",
+	"/var/www/owo/templates/fragments/head.fragment.html.tmpl",
+	"/var/www/owo/templates/fragments/header.fragment.html.tmpl",
+	"/var/www/owo/templates/fragments/content.fragment.html.tmpl",
+	"/var/www/owo/templates/fragments/footer.fragment.html.tmpl",
 
-	"web/templates/components/card.component.html.tmpl",
-	"web/templates/components/iframe.component.html.tmpl",
-	"web/templates/components/html.component.html.tmpl",
-	"web/templates/components/image.component.html.tmpl",
-	"web/templates/components/code.component.html.tmpl",
-	"web/templates/components/hr.component.html.tmpl",
+	"/var/www/owo/templates/components/card.component.html.tmpl",
+	"/var/www/owo/templates/components/iframe.component.html.tmpl",
+	"/var/www/owo/templates/components/html.component.html.tmpl",
+	"/var/www/owo/templates/components/image.component.html.tmpl",
+	"/var/www/owo/templates/components/code.component.html.tmpl",
+	"/var/www/owo/templates/components/hr.component.html.tmpl",
 }
 
 func GetServerPort() int {
