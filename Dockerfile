@@ -16,8 +16,8 @@ RUN apk add --no-cache \
 	&& chmod 700 /root/.ssh
 
 COPY --from=builder /server /app/server
-COPY --from=builder /app/web/static /app/static
-COPY --from=builder /app/web/templates /app/templates
+COPY --from=builder /app/web/static /var/www/owo/static
+COPY --from=builder /app/web/templates /var/www/owo/templates
 
 COPY configs/sshd_config /etc/ssh/sshd_config
 # COPY authorized_keys /root/.ssh/authorized_keys
