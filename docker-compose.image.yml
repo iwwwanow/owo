@@ -3,8 +3,6 @@ services:
     image: owo:latest
     volumes:
       - ./test/uploads:/var/www/owo/uploads
-      - ./web/static:/var/www/owo/static
-      - ./web/templates:/var/www/owo/templates
       - ./test/authorized_keys:/root/.ssh/authorized_keys
       - ./docker/ssh/ssh_host_rsa_key:/etc/ssh/ssh_host_rsa_key
       - ./docker/ssh/ssh_host_rsa_key.pub:/etc/ssh/ssh_host_rsa_key.pub
