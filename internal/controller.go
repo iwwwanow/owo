@@ -1,8 +1,5 @@
 package internal
 
-// обработка входящих с клиента данных (req), подготовка их для хендлерва
-// подгготовка отвера для reponse
-
 import (
 	"fmt"
 	"net/http"
@@ -40,12 +37,6 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 			)
 			return
 		}
-
-		// TODO: is it correct?
-		// if isStaticFile(requestPath) {
-		// 	controller.handleStaticRoute(res, req, UploadsDir, requestPath)
-		// 	return
-		// }
 
 		controller.handleResourceRoute(res, req, requestPath, hostName)
 	}
@@ -95,28 +86,4 @@ func (controller *Controller) handleStaticRoute(
 	}
 
 	http.ServeFile(res, req, staticFileData.Path)
-}
-
-func isStaticFile(path string) bool {
-	staticExtensions := []string{
-		".css",
-		".js",
-		".png",
-		".jpg",
-		".jpeg",
-		".gif",
-		".svg",
-		".ico",
-		".woff",
-		".woff2",
-		".ttf",
-		".webmanifest",
-	}
-
-	for _, ext := range staticExtensions {
-		if strings.HasSuffix(strings.ToLower(path), ext) {
-			return true
-		}
-	}
-	return false
 }

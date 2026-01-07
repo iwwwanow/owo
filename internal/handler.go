@@ -1,5 +1,7 @@
 package internal
 
+// TODO: большую часть переносить в renderer
+
 import (
 	"fmt"
 	"html/template"
@@ -10,10 +12,6 @@ import (
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 )
-
-// # основная логика приложения
-// # работа с пришедшими с контроллера данными. они должны быть адаптированны для хендлера
-// # оркестрация и repository и renderer
 
 type Handler struct {
 	renderer   Renderer
@@ -43,10 +41,7 @@ func (handler *Handler) HandleResource(requestPath string, hostName string) (tem
 	handler.repository.SetChildResourcesData(&resourceData, &childResourcesData)
 
 	var props ResourcePageProps
-	// TODO: title logic
 	props.Header.Title = hostName
-	// props.Resource = resourceData
-	// props.Resources = childResourcesData
 
 	mapDataToProps(&props, &resourceData, &childResourcesData)
 

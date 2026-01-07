@@ -52,15 +52,12 @@ type StaticFileData struct {
 }
 
 type ResourceData struct {
-	// TODO: why caps?
 	Meta     MetaData
 	Static   StaticData
 	Path     string
 	FullPath string
 	Name     string
 	Type     string
-	// TODO: fill it on renderer
-	// Preview  string
 }
 
 func NewRepository() *Repository {
