@@ -88,6 +88,20 @@ jobs:
           build-args: |
             VERSION=${{ steps.tag_info.outputs.VERSION }}
 
+        # TODO: fix it
+      - name: Cleanup old containers before deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: 89.169.47.224
+          username: root
+          key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+          script: |
+            echo "=== Очистка старых контейнеров owo ==="
+            docker ps -a --filter "name=owo" --format "{{.ID}}" | xargs -r docker rm -f
+            sleep 3
+            echo "=== Проверка порта 2222 ==="
+            netstat -tln | grep :2222 || echo "Порт 2222 свободен"
+
       - name: Deploy Docker Image to Dokku
         uses: dokku/github-action@v1.9.0
         with:
