@@ -91,7 +91,8 @@ jobs:
       - name: Deploy Docker Image to Dokku
         uses: dokku/github-action@v1.9.0
         with:
-          git_remote_url: 'ssh://dokku@сервер:22/owo-app'
+          # TODO: github-vars
+          git_remote_url: 'ssh://dokku@89.169.47.224:22/owo'
           ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
           command: deploy
           deploy_docker_image: 'ghcr.io/${{ github.repository }}:${{ steps.tag_info.outputs.VERSION }}'
