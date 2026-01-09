@@ -5,7 +5,13 @@
       "port": 8080
     },
     "sftp": {
-      "port": 22
+      "publishedPorts": [
+        {
+          "publishedAs": 2222,
+          "fromContainerPort": 22,
+          "protocol": "tcp"
+        }
+      ]
     }
   }
 }
