@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  caddy:
+    image: caddy:2.10.2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - owwo_network
+
+  owwo:
+    image: ghcr.io/iwwwanow/owwo:latest
+    ports:
+      - "8080:8080"
+      - "2222:22"
+    volumes:
+      - /var/www/owwo/shared:/var/www/owwo/shared
+    networks:
+      - owwo_network
+    restart: unless-stopped
+
+networks:
+  owwo_network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
