@@ -1,3 +1,6 @@
+- [ ] fluxCd, k3s, or microk8s
+- [ ] uploads backup
+
 - [ ] hide hidden
 - [ ] выпустить v1
 - [ ] сформировать roadmap до v2
