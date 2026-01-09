@@ -1,5 +1,6 @@
 - [ ] fluxCd, k3s, or microk8s
 - [ ] uploads backup
+- [ ] какбудто переносимые данные можно вынести в named-volumes
 
 - [ ] hide hidden
 - [ ] выпустить v1
