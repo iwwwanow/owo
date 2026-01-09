@@ -1,0 +1,89 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+      - beta
+
+permissions:
+  contents: read # for checkout
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for trusted publishing and npm provenance
+    outputs:
+      new_release_published: ${{ steps.semantic_release.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic_release.outputs.new_release_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Install dependencies
+        run: |
+          npm install --no-save semantic-release @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/github
+      
+      # Используем готовый action для semantic-release
+      - name: Semantic Release
+        id: semantic_release
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  docker:
+    name: Build and Push Docker Image
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    # Запускать только если semantic-release создал новый релиз
+    if: needs.release.outputs.new_release_published != 'false'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Получаем тег ИЗ OUTPUT semantic-release (не из GITHUB_REF!)
+      - name: Extract tag from semantic-release output
+        id: tag_info
+        run: |
+          echo "Version from semantic-release: ${{ needs.release.outputs.new_release_version }}"
+          
+          # Сохраняем в outputs текущего шага
+          echo "VERSION=${{ needs.release.outputs.new_release_version }}" >> $GITHUB_OUTPUT
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ steps.tag_info.outputs.VERSION }}
+            ghcr.io/${{ github.repository }}:latest
+          build-args: |
+            VERSION=${{ steps.tag_info.outputs.VERSION }}

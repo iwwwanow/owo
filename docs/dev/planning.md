@@ -3,6 +3,9 @@
 - [ ] github curl to owo to setup app
 - [ ] github curl to infra to launch all apps
 - [ ] v1 and versioning
+- [ ] https://github.com/pustovitDmytro/semantic-release-telegram
+- [ ] https://github.com/pustovitDmytro/semantic-release-telegram
+- [ ] https://github.com/skoropadas/semantic-release-telegram-bot
 
 ---
 
