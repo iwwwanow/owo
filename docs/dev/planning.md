@@ -1,3 +1,10 @@
+- пайплайн в текущем репозитории:
+  - бамп версии пакета
+  - сборка образа
+  - публикация образа
+- что мне нужно от инфры:
+  - автообновление docker-compose из инфры
+  - автообновление образов в docker-compose на хосте
 - [ ] https://github.com/kimdre/doco-cd
 - [ ] push image on github
 - [ ] pull on host. by auto-updater-image (google it)
