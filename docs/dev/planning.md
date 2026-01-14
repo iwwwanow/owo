@@ -1,3 +1,4 @@
+- [ ] https://github.com/kimdre/doco-cd
 - [ ] push image on github
 - [ ] pull on host. by auto-updater-image (google it)
 - [ ] github curl to owo to setup app
