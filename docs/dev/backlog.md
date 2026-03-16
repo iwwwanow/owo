@@ -1,3 +1,5 @@
+- [ ] username.owo.ru - бесплатный домент с лимитом на хранение
+
 - [ ] github link preview
 
 - [ ] fluxCd, k3s, or microk8s
