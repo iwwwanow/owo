@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
@@ -151,8 +152,10 @@ func (repository *Repository) SetChildResourcesData(
 		if link := GetResourceLink(childResourceData.Path); link != "" {
 			childResourceData.LinkTarget = link
 			if childResourceData.Static.CoverPath == "" {
+				decoded, _ := url.PathUnescape(link)
+				actualPath := ResolveTransliteratedPath(UploadsDir, decoded)
 				var targetData ResourceData
-				repository.SetResourceData(link, &targetData)
+				repository.SetResourceData(actualPath, &targetData)
 				repository.SetResourceStaticData(&targetData, &targetData.Static)
 				childResourceData.Static.CoverPath = targetData.Static.CoverPath
 			}
