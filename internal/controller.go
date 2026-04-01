@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -55,7 +56,8 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 
 		resolvedPath := ResolveTransliteratedPath(UploadsDir, requestPath)
 		if linkTarget := GetResourceLink(resolvedPath); linkTarget != "" {
-			http.Redirect(res, req, "/"+transliteratePathSegments(linkTarget), http.StatusFound)
+			decoded, _ := url.PathUnescape(linkTarget)
+			http.Redirect(res, req, "/"+transliteratePathSegments(decoded), http.StatusFound)
 			return
 		}
 		controller.handleResourceRoute(res, req, resolvedPath, hostName)
