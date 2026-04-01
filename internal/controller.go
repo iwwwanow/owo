@@ -31,15 +31,14 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 			return
 		}
 
-		if strings.HasPrefix(requestPath, "uploads/") {
-			filePath := strings.TrimPrefix(requestPath, "uploads/")
+		if req.URL.Query().Has("static") {
 			width := req.URL.Query().Get("width")
 			height := req.URL.Query().Get("height")
 			if width != "" || height != "" {
-				controller.handleImageResizeRoute(res, req, filePath, width, height)
+				controller.handleImageResizeRoute(res, req, requestPath, width, height)
 				return
 			}
-			controller.handleStaticRoute(res, req, UploadsDir, filePath)
+			controller.handleStaticRoute(res, req, UploadsDir, requestPath)
 			return
 		}
 
