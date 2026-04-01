@@ -1,0 +1,9 @@
+/* span-2: 2 колонки */
+#card-0_way-to-the-temple-of-the-goddess-of-flowers {
+  grid-column: span 2;
+}
+
+/* span-4: 4 колонки */
+#card-2021_digital_meeting-with-the-goddess-of-flowers-1 {
+  grid-column: span 4;
+}
