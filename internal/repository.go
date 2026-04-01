@@ -252,7 +252,7 @@ func (repository *Repository) GetResizedImagePath(uploadsRelPath, widthStr, heig
 		return "", err
 	}
 
-	resized := imaging.Fill(src, width, height, imaging.Center, imaging.Lanczos)
+	resized := imaging.Fill(src, width, height, imaging.Center, imaging.Box)
 
 	if err := os.MkdirAll(filepath.Dir(cachedPath), 0755); err != nil {
 		return "", err
