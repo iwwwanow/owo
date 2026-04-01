@@ -5,15 +5,13 @@
 
   {{ if or .Resource.HtmlContent .Resource.ContentPath .Resource.Content }}
     <div class="grid">
-      <div class="grid__right-content">
-        {{ if eq .Resource.Type "html" }}
-          {{ template "html" .Resource.HtmlContent }}
-        {{ else if eq .Resource.Type "image" }}
-          {{ template "image" .Resource.ContentPath }}
-        {{ else }}
-          {{ template "code" .Resource.Content }}
-        {{ end }}
-      </div>
+      {{ if eq .Resource.Type "html" }}
+        {{ template "html" .Resource.HtmlContent }}
+      {{ else if eq .Resource.Type "image" }}
+        {{ template "image" .Resource.ContentPath }}
+      {{ else }}
+        {{ template "code" .Resource.Content }}
+      {{ end }}
     </div>
   {{ end }}
 
