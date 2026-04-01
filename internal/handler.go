@@ -121,6 +121,9 @@ func (handler *Handler) mapDataToProps(
 					Resources: []ChildResourceProps{},
 				}
 				for _, gc := range grandchildren {
+					if strings.HasPrefix(gc.Name, ".") {
+						continue
+					}
 					var gcProps ChildResourceProps
 					gcProps.ID = "card-" + strings.NewReplacer("/", "-", " ", "-").Replace(transliteratePathSegments(gc.Path))
 					gcProps.Path = transliteratePathSegments(gc.Path)
