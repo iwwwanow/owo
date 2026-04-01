@@ -21,10 +21,6 @@
   grid-auto-rows: minmax(min-content, max-content);
 }
 
-.grid--hidden {
-  margin-top: 80px;
-}
-
 .grid > * {
   height: min-content;
 }
