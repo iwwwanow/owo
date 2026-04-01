@@ -37,6 +37,7 @@ type ResourceProps struct {
 }
 
 type ChildResourceProps struct {
+	ID          string
 	Path        string
 	Title       string
 	Description string
