@@ -46,6 +46,7 @@ type ChildResourceProps struct {
 
 type SectionProps struct {
 	Label     string
+	Slug      string
 	Resources []ChildResourceProps
 }
 

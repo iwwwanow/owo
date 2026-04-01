@@ -16,7 +16,7 @@
   {{ end }}
 
   {{ if .Resources }}
-    <div class="grid">
+    <div id="grid-common" class="grid">
       {{ template "hr" "resources" }}
 
       {{ range .Resources }}
@@ -27,7 +27,7 @@
 
   {{ if .Sections }}
     {{ range .Sections }}
-      <div class="grid">
+      <div id="grid-{{ .Slug }}" class="grid">
         {{ template "hr" .Label }}
 
         {{ range .Resources }}
@@ -38,7 +38,7 @@
   {{ end }}
 
   {{ if .HiddenResources }}
-    <div class="grid grid--hidden">
+    <div id="grid-hidden" class="grid grid--hidden">
       {{ template "hr" "hidden" }}
 
       {{ range .HiddenResources }}

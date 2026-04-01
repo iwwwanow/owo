@@ -116,8 +116,10 @@ func (handler *Handler) mapDataToProps(
 				var grandchildren []ResourceData
 				handler.repository.SetChildResourcesData(&childResourceData, &grandchildren)
 
+				label := strings.TrimPrefix(childResourceData.Name, "_")
 				section := SectionProps{
-					Label:     strings.TrimPrefix(childResourceData.Name, "_"),
+					Label:     label,
+					Slug:      strings.ToLower(strings.NewReplacer(" ", "-").Replace(TransliterateToLatin(label))),
 					Resources: []ChildResourceProps{},
 				}
 				for _, gc := range grandchildren {
