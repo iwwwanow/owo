@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,13 +10,13 @@ import (
 )
 
 func TransliterateToLatin(s string) string {
-	return unidecode.Unidecode(s)
+	return strings.ReplaceAll(unidecode.Unidecode(s), "'", "")
 }
 
 func transliteratePathSegments(path string) string {
 	parts := strings.Split(path, "/")
 	for i, p := range parts {
-		parts[i] = TransliterateToLatin(p)
+		parts[i] = url.PathEscape(TransliterateToLatin(p))
 	}
 	return strings.Join(parts, "/")
 }
