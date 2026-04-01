@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
@@ -53,6 +54,17 @@ func (handler *Handler) HandleStatic(staticDir string, requestPath string) Stati
 	return staticFileData
 }
 
+func (handler *Handler) HandleImageResize(requestPath, width, height string) StaticFileData {
+	cachedPath, err := handler.repository.GetResizedImagePath(requestPath, width, height)
+	if err != nil {
+		return handler.repository.GetStaticFileData(UploadsDir, requestPath)
+	}
+	return StaticFileData{
+		Path: cachedPath,
+		Ext:  filepath.Ext(cachedPath),
+	}
+}
+
 func mapDataToProps(
 	props *ResourcePageProps,
 	resourceData *ResourceData,
@@ -83,20 +95,22 @@ func mapDataToProps(
 		}
 	}
 
-	if props.Resources == nil {
-		props.Resources = []ChildResourceProps{}
-	}
+	props.Resources = []ChildResourceProps{}
+	props.HiddenResources = []ChildResourceProps{}
 
 	if childResourcesData != nil {
 		for _, childResourceData := range *childResourcesData {
 			var childResourceProps ChildResourceProps
 			childResourceProps.Path = childResourceData.Path
-			// childResourceProps.Title = childResourceData.Meta.Title
 			childResourceProps.Title = childResourceData.Name
 			childResourceProps.Description = childResourceData.Meta.Description
 			childResourceProps.Cover = childResourceData.Static.CoverPath
 
-			props.Resources = append(props.Resources, childResourceProps)
+			if strings.HasPrefix(childResourceData.Name, ".") {
+				props.HiddenResources = append(props.HiddenResources, childResourceProps)
+			} else {
+				props.Resources = append(props.Resources, childResourceProps)
+			}
 		}
 	}
 }

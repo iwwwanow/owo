@@ -1,10 +1,14 @@
 package internal
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
+
+	"github.com/disintegration/imaging"
 )
 
 const (
@@ -18,6 +22,7 @@ const (
 	// TODO env
 	UploadsDir       = "/var/www/owo/uploads"
 	StaticDir        = "/var/www/owo/static"
+	CacheDir         = "/var/www/owo/cache"
 	MetaDirName      = ".meta"
 	PreviewMaxLength = 50
 )
@@ -219,6 +224,39 @@ func setDirectoryStaticData(resourceData *ResourceData, static *StaticData) {
 			static.CoverPath = coverPath
 		}
 	}
+}
+
+func (repository *Repository) GetResizedImagePath(uploadsRelPath, widthStr, heightStr string) (string, error) {
+	width, _ := strconv.Atoi(widthStr)
+	height, _ := strconv.Atoi(heightStr)
+
+	if width == 0 && height == 0 {
+		return filepath.Join(UploadsDir, uploadsRelPath), nil
+	}
+
+	dimKey := fmt.Sprintf("%dx%d", width, height)
+	cachedPath := filepath.Join(CacheDir, dimKey, uploadsRelPath)
+
+	if _, err := os.Stat(cachedPath); err == nil {
+		return cachedPath, nil
+	}
+
+	originalPath := filepath.Join(UploadsDir, uploadsRelPath)
+	src, err := imaging.Open(originalPath)
+	if err != nil {
+		return "", err
+	}
+
+	resized := imaging.Resize(src, width, height, imaging.Lanczos)
+
+	if err := os.MkdirAll(filepath.Dir(cachedPath), 0755); err != nil {
+		return "", err
+	}
+	if err := imaging.Save(resized, cachedPath); err != nil {
+		return "", err
+	}
+
+	return cachedPath, nil
 }
 
 func findDirectoryCover(resourcePath, resourceFullPath string) string {

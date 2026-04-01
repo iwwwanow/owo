@@ -44,10 +44,11 @@ type ChildResourceProps struct {
 }
 
 type ResourcePageProps struct {
-	Header    HeaderProps
-	Page      PageProps
-	Resource  ResourceProps
-	Resources []ChildResourceProps
+	Header          HeaderProps
+	Page            PageProps
+	Resource        ResourceProps
+	Resources       []ChildResourceProps
+	HiddenResources []ChildResourceProps
 }
 
 func NewRenderer() (*Renderer, error) {

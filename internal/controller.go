@@ -1,10 +1,14 @@
 package internal
 
 import (
+	"archive/zip"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 type Controller struct {
@@ -22,9 +26,20 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 		hostName := req.Host
 		requestPath := strings.TrimPrefix(req.URL.Path, "/")
 
-		if req.URL.Query().Has("static") {
-			fmt.Println("handle static")
-			controller.handleStaticRoute(res, req, UploadsDir, requestPath)
+		if requestPath == "backup" {
+			controller.handleBackupRoute(res, req)
+			return
+		}
+
+		if strings.HasPrefix(requestPath, "uploads/") {
+			filePath := strings.TrimPrefix(requestPath, "uploads/")
+			width := req.URL.Query().Get("width")
+			height := req.URL.Query().Get("height")
+			if width != "" || height != "" {
+				controller.handleImageResizeRoute(res, req, filePath, width, height)
+				return
+			}
+			controller.handleStaticRoute(res, req, UploadsDir, filePath)
 			return
 		}
 
@@ -57,6 +72,64 @@ func (controller *Controller) handleResourceRoute(
 	res.Header().Set("Content-Type", "text/html; charset=utf-8")
 	res.WriteHeader(http.StatusOK)
 	res.Write([]byte(htmlContent))
+}
+
+func (controller *Controller) handleImageResizeRoute(
+	res http.ResponseWriter,
+	req *http.Request,
+	requestPath, width, height string,
+) {
+	staticFileData := controller.handler.HandleImageResize(requestPath, width, height)
+
+	if _, err := os.Stat(staticFileData.Path); os.IsNotExist(err) {
+		http.NotFound(res, req)
+		return
+	}
+
+	switch staticFileData.Ext {
+	case ".png":
+		res.Header().Set("Content-Type", "image/png")
+	case ".jpg", ".jpeg":
+		res.Header().Set("Content-Type", "image/jpeg")
+	case ".webp":
+		res.Header().Set("Content-Type", "image/webp")
+	}
+
+	http.ServeFile(res, req, staticFileData.Path)
+}
+
+func (controller *Controller) handleBackupRoute(res http.ResponseWriter, req *http.Request) {
+	filename := fmt.Sprintf("owo-backup-%s.zip", time.Now().Format("20060102-150405"))
+	res.Header().Set("Content-Type", "application/zip")
+	res.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
+
+	zw := zip.NewWriter(res)
+	defer zw.Close()
+
+	err := filepath.Walk(UploadsDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return err
+		}
+		rel, err := filepath.Rel(UploadsDir, path)
+		if err != nil {
+			return err
+		}
+		w, err := zw.Create(rel)
+		if err != nil {
+			return err
+		}
+		f, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		_, err = io.Copy(w, f)
+		return err
+	})
+
+	if err != nil {
+		fmt.Printf("backup error: %v\n", err)
+	}
 }
 
 func (controller *Controller) handleStaticRoute(
