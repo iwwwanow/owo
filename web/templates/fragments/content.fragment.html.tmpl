@@ -26,4 +26,14 @@
       {{ end }}
     </div>
   {{ end }}
+
+  {{ if .HiddenResources }}
+    <div class="grid grid--hidden">
+      {{ template "hr" "hidden" }}
+
+      {{ range .HiddenResources }}
+        {{ template "card" . }}
+      {{ end }}
+    </div>
+  {{ end }}
 {{ end }}
