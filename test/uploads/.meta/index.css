@@ -7,3 +7,30 @@
 #card-2021_digital_meeting-with-the-goddess-of-flowers-1 {
   grid-column: span 4;
 }
+
+@media screen and (max-width: 858px) {
+  #card-0_way-to-the-temple-of-the-goddess-of-flowers {
+    grid-column: span 3;
+  }
+  #card-2021_digital_meeting-with-the-goddess-of-flowers-1 {
+    grid-column: span 3;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  #card-0_way-to-the-temple-of-the-goddess-of-flowers {
+    grid-column: span 2;
+  }
+  #card-2021_digital_meeting-with-the-goddess-of-flowers-1 {
+    grid-column: span 2;
+  }
+}
+
+@media screen and (max-width: 444px) {
+  #card-0_way-to-the-temple-of-the-goddess-of-flowers {
+    grid-column: span 1;
+  }
+  #card-2021_digital_meeting-with-the-goddess-of-flowers-1 {
+    grid-column: span 1;
+  }
+}
