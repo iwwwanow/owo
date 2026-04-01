@@ -41,6 +41,18 @@
   width: 100%;
 }
 
+.grid--hidden .card__wrapper {
+  height: 80px;
+}
+
+.card--span-2 {
+  grid-column: span 2;
+}
+
+.card--span-4 {
+  grid-column: span 4;
+}
+
 @media screen and (max-width: 360px) {
   .card__wrapper {
     height: 214px;
