@@ -247,7 +247,7 @@ func (repository *Repository) GetResizedImagePath(uploadsRelPath, widthStr, heig
 		return originalPath, nil
 	}
 
-	src, err := imaging.Open(originalPath)
+	src, err := imaging.Open(originalPath, imaging.AutoOrientation(true))
 	if err != nil {
 		return "", err
 	}
