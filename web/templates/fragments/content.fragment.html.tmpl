@@ -27,6 +27,18 @@
     </div>
   {{ end }}
 
+  {{ if .Sections }}
+    {{ range .Sections }}
+      <div class="grid">
+        {{ template "hr" .Label }}
+
+        {{ range .Resources }}
+          {{ template "card" . }}
+        {{ end }}
+      </div>
+    {{ end }}
+  {{ end }}
+
   {{ if .HiddenResources }}
     <div class="grid grid--hidden">
       {{ template "hr" "hidden" }}

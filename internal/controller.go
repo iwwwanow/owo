@@ -32,13 +32,14 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 		}
 
 		if req.URL.Query().Has("static") {
+			resolvedPath := ResolveTransliteratedPath(UploadsDir, requestPath)
 			width := req.URL.Query().Get("width")
 			height := req.URL.Query().Get("height")
 			if width != "" || height != "" {
-				controller.handleImageResizeRoute(res, req, requestPath, width, height)
+				controller.handleImageResizeRoute(res, req, resolvedPath, width, height)
 				return
 			}
-			controller.handleStaticRoute(res, req, UploadsDir, requestPath)
+			controller.handleStaticRoute(res, req, UploadsDir, resolvedPath)
 			return
 		}
 
@@ -52,7 +53,8 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 			return
 		}
 
-		controller.handleResourceRoute(res, req, requestPath, hostName)
+		resolvedPath := ResolveTransliteratedPath(UploadsDir, requestPath)
+		controller.handleResourceRoute(res, req, resolvedPath, hostName)
 	}
 }
 

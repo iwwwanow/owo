@@ -44,12 +44,18 @@ type ChildResourceProps struct {
 	Cover       string
 }
 
+type SectionProps struct {
+	Label     string
+	Resources []ChildResourceProps
+}
+
 type ResourcePageProps struct {
 	Header          HeaderProps
 	Page            PageProps
 	Resource        ResourceProps
 	Resources       []ChildResourceProps
 	HiddenResources []ChildResourceProps
+	Sections        []SectionProps
 }
 
 func NewRenderer() (*Renderer, error) {

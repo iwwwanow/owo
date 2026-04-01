@@ -44,7 +44,7 @@ func (handler *Handler) HandleResource(requestPath string, hostName string) (tem
 	var props ResourcePageProps
 	props.Header.Title = hostName
 
-	mapDataToProps(&props, &resourceData, &childResourcesData)
+	handler.mapDataToProps(&props, &resourceData, &childResourcesData)
 
 	return handler.renderer.RenderResourcePage(&props)
 }
@@ -65,7 +65,7 @@ func (handler *Handler) HandleImageResize(requestPath, width, height string) Sta
 	}
 }
 
-func mapDataToProps(
+func (handler *Handler) mapDataToProps(
 	props *ResourcePageProps,
 	resourceData *ResourceData,
 	childResourcesData *[]ResourceData,
@@ -75,14 +75,14 @@ func mapDataToProps(
 	props.Page.Html = resourceData.Static.HtmlPath
 	props.Page.Css = resourceData.Static.CssPath
 	props.Page.Js = resourceData.Static.JsPath
-	props.Page.Cover = resourceData.Static.CoverPath
+	props.Page.Cover = transliteratePathSegments(resourceData.Static.CoverPath)
 
 	// TODO: для контента, возможно, имеет смысл добавить отдельный объект. нужно перебрать его и на уровне шаблонов
 	props.Resource.Type = resourceData.Type
 	// TODO:
 	props.Resource.Content = resourceData.Static.Content
 	if props.Resource.Type == fileTypeImage {
-		props.Resource.ContentPath = resourceData.Path
+		props.Resource.ContentPath = transliteratePathSegments(resourceData.Path)
 	}
 	// TODO: renderer
 	if resourceData.Static.MdPath != "" {
@@ -97,22 +97,49 @@ func mapDataToProps(
 
 	props.Resources = []ChildResourceProps{}
 	props.HiddenResources = []ChildResourceProps{}
+	props.Sections = []SectionProps{}
 
 	if childResourcesData != nil {
 		for _, childResourceData := range *childResourcesData {
 			var childResourceProps ChildResourceProps
-			childResourceProps.ID = "card-" + strings.NewReplacer("/", "-", " ", "-").Replace(childResourceData.Path)
-			childResourceProps.Path = childResourceData.Path
+			childResourceProps.ID = "card-" + strings.NewReplacer("/", "-", " ", "-").Replace(transliteratePathSegments(childResourceData.Path))
+			childResourceProps.Path = transliteratePathSegments(childResourceData.Path)
 			childResourceProps.Title = childResourceData.Name
 			childResourceProps.Description = childResourceData.Meta.Description
-			childResourceProps.Cover = childResourceData.Static.CoverPath
+			childResourceProps.Cover = transliteratePathSegments(childResourceData.Static.CoverPath)
 
-			if strings.HasPrefix(childResourceData.Name, ".") {
+			switch {
+			case strings.HasPrefix(childResourceData.Name, "."):
 				props.HiddenResources = append(props.HiddenResources, childResourceProps)
-			} else {
+
+			case strings.HasPrefix(childResourceData.Name, "_") && childResourceData.Type == fileTypeDir:
+				var grandchildren []ResourceData
+				handler.repository.SetChildResourcesData(&childResourceData, &grandchildren)
+
+				section := SectionProps{
+					Label:     strings.TrimPrefix(childResourceData.Name, "_"),
+					Resources: []ChildResourceProps{},
+				}
+				for _, gc := range grandchildren {
+					var gcProps ChildResourceProps
+					gcProps.ID = "card-" + strings.NewReplacer("/", "-", " ", "-").Replace(transliteratePathSegments(gc.Path))
+					gcProps.Path = transliteratePathSegments(gc.Path)
+					gcProps.Title = gc.Name
+					gcProps.Description = gc.Meta.Description
+					gcProps.Cover = transliteratePathSegments(gc.Static.CoverPath)
+					section.Resources = append(section.Resources, gcProps)
+				}
+				props.Sections = append(props.Sections, section)
+
+			default:
 				props.Resources = append(props.Resources, childResourceProps)
 			}
 		}
+	}
+
+	if strings.HasPrefix(resourceData.Name, "_") {
+		props.HiddenResources = append(props.HiddenResources, props.Resources...)
+		props.Resources = []ChildResourceProps{}
 	}
 }
 
