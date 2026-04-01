@@ -101,6 +101,7 @@ func mapDataToProps(
 	if childResourcesData != nil {
 		for _, childResourceData := range *childResourcesData {
 			var childResourceProps ChildResourceProps
+			childResourceProps.ID = "card-" + strings.NewReplacer("/", "-", " ", "-").Replace(childResourceData.Path)
 			childResourceProps.Path = childResourceData.Path
 			childResourceProps.Title = childResourceData.Name
 			childResourceProps.Description = childResourceData.Meta.Description
