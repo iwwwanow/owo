@@ -2,11 +2,15 @@
   <a class="card__wrapper border_light" href="/{{ .Path }}">
     {{ if .Cover }}
       <picture class="card__cover-container">
-        <!-- TODO -->
-        <!-- <source srcset={imageWidth190px2xSource} media="(max-width: 360px)" /> -->
-        <!-- <source srcset={image2xSrcset} /> -->
+        <source
+          srcset="/{{ .Cover }}?static&width=360&height=214 1x, /{{ .Cover }}?static&width=720&height=428 2x"
+          media="(max-width: 360px)"
+        />
+        <source
+          srcset="/{{ .Cover }}?static&width=190&height=288 1x, /{{ .Cover }}?static&width=380&height=576 2x"
+        />
         <img
-          src="/{{ .Cover }}?static"
+          src="/{{ .Cover }}?static&width=190&height=288"
           class="card__img"
           alt="page card cover"
         />
