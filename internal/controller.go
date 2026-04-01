@@ -54,6 +54,10 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 		}
 
 		resolvedPath := ResolveTransliteratedPath(UploadsDir, requestPath)
+		if linkTarget := GetResourceLink(resolvedPath); linkTarget != "" {
+			http.Redirect(res, req, "/"+transliteratePathSegments(linkTarget), http.StatusFound)
+			return
+		}
 		controller.handleResourceRoute(res, req, resolvedPath, hostName)
 	}
 }

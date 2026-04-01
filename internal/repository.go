@@ -33,7 +33,10 @@ const (
 	StaticCssName   = "index.css"
 	StaticJsName    = "index.js"
 	StaticCoverName = "cover"
+	StaticLinkName  = "index.link"
 )
+
+var resizeSemaphore = make(chan struct{}, 3)
 
 type Repository struct{}
 
@@ -57,16 +60,26 @@ type StaticFileData struct {
 }
 
 type ResourceData struct {
-	Meta     MetaData
-	Static   StaticData
-	Path     string
-	FullPath string
-	Name     string
-	Type     string
+	Meta       MetaData
+	Static     StaticData
+	Path       string
+	FullPath   string
+	Name       string
+	Type       string
+	LinkTarget string
 }
 
 func NewRepository() *Repository {
 	return &Repository{}
+}
+
+func GetResourceLink(resourcePath string) string {
+	linkFile := filepath.Join(UploadsDir, resourcePath, MetaDirName, StaticLinkName)
+	content, err := os.ReadFile(linkFile)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(content))
 }
 
 func (repository *Repository) SetResourceData(resourcePath string, resourceData *ResourceData) {
@@ -134,6 +147,16 @@ func (repository *Repository) SetChildResourcesData(
 		repository.SetResourceData(childResourcePath, &childResourceData)
 		repository.SetResourceMetaData(&childResourceData, &childResourceData.Meta)
 		repository.SetResourceStaticData(&childResourceData, &childResourceData.Static)
+
+		if link := GetResourceLink(childResourceData.Path); link != "" {
+			childResourceData.LinkTarget = link
+			if childResourceData.Static.CoverPath == "" {
+				var targetData ResourceData
+				repository.SetResourceData(link, &targetData)
+				repository.SetResourceStaticData(&targetData, &targetData.Static)
+				childResourceData.Static.CoverPath = targetData.Static.CoverPath
+			}
+		}
 
 		*childResourcesData = append(*childResourcesData, childResourceData)
 	}
@@ -246,6 +269,9 @@ func (repository *Repository) GetResizedImagePath(uploadsRelPath, widthStr, heig
 	if strings.ToLower(filepath.Ext(uploadsRelPath)) == ".gif" {
 		return originalPath, nil
 	}
+
+	resizeSemaphore <- struct{}{}
+	defer func() { <-resizeSemaphore }()
 
 	src, err := imaging.Open(originalPath, imaging.AutoOrientation(true))
 	if err != nil {
