@@ -11,7 +11,7 @@
     </div>
 
     {{ if .Page.Js }}
-      <script defer src="{{ .Page.Js }}?static"></script>
+      <script defer src="/{{ .Page.Js }}?static"></script>
     {{ end }}
   </body>
 {{ end }}

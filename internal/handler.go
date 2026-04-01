@@ -73,8 +73,8 @@ func (handler *Handler) mapDataToProps(
 	props.Page.Title = resourceData.Meta.Title
 	props.Page.Description = resourceData.Meta.Description
 	props.Page.Html = resourceData.Static.HtmlPath
-	props.Page.Css = resourceData.Static.CssPath
-	props.Page.Js = resourceData.Static.JsPath
+	props.Page.Css = transliteratePathSegments(resourceData.Static.CssPath)
+	props.Page.Js = transliteratePathSegments(resourceData.Static.JsPath)
 	props.Page.Cover = transliteratePathSegments(resourceData.Static.CoverPath)
 
 	// TODO: для контента, возможно, имеет смысл добавить отдельный объект. нужно перебрать его и на уровне шаблонов
