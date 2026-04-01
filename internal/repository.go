@@ -242,6 +242,11 @@ func (repository *Repository) GetResizedImagePath(uploadsRelPath, widthStr, heig
 	}
 
 	originalPath := filepath.Join(UploadsDir, uploadsRelPath)
+
+	if strings.ToLower(filepath.Ext(uploadsRelPath)) == ".gif" {
+		return originalPath, nil
+	}
+
 	src, err := imaging.Open(originalPath)
 	if err != nil {
 		return "", err
