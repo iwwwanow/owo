@@ -37,11 +37,12 @@ type ResourceProps struct {
 }
 
 type ChildResourceProps struct {
-	ID          string
-	Path        string
-	Title       string
-	Description string
-	Cover       string
+	ID           string
+	Path         string
+	Title        string
+	Description  string
+	Cover        string
+	CoverIsVideo bool
 }
 
 type SectionProps struct {

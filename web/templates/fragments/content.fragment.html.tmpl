@@ -10,6 +10,8 @@
           {{ template "html" .Resource.HtmlContent }}
         {{ else if eq .Resource.Type "image" }}
           {{ template "image" .Resource.ContentPath }}
+        {{ else if eq .Resource.Type "video" }}
+          {{ template "video" .Resource.ContentPath }}
         {{ else }}
           {{ template "code" .Resource.Content }}
         {{ end }}

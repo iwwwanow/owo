@@ -84,6 +84,9 @@ func (handler *Handler) mapDataToProps(
 	if props.Resource.Type == fileTypeImage {
 		props.Resource.ContentPath = transliteratePathSegments(resourceData.Path)
 	}
+	if props.Resource.Type == fileTypeVideo {
+		props.Resource.ContentPath = transliteratePathSegments(resourceData.Path)
+	}
 	// TODO: renderer
 	if resourceData.Static.MdPath != "" {
 		// TODO: contentType?
@@ -107,6 +110,7 @@ func (handler *Handler) mapDataToProps(
 			childResourceProps.Title = childResourceData.Name
 			childResourceProps.Description = childResourceData.Meta.Description
 			childResourceProps.Cover = transliteratePathSegments(childResourceData.Static.CoverPath)
+			childResourceProps.CoverIsVideo = isVideoExt(childResourceData.Static.CoverPath)
 
 			switch {
 			case strings.HasPrefix(childResourceData.Name, "."):
@@ -132,6 +136,7 @@ func (handler *Handler) mapDataToProps(
 					gcProps.Title = gc.Name
 					gcProps.Description = gc.Meta.Description
 					gcProps.Cover = transliteratePathSegments(gc.Static.CoverPath)
+					gcProps.CoverIsVideo = isVideoExt(gc.Static.CoverPath)
 					section.Resources = append(section.Resources, gcProps)
 				}
 				props.Sections = append(props.Sections, section)
@@ -146,6 +151,11 @@ func (handler *Handler) mapDataToProps(
 		props.HiddenResources = append(props.HiddenResources, props.Resources...)
 		props.Resources = []ChildResourceProps{}
 	}
+}
+
+func isVideoExt(path string) bool {
+	ext := strings.ToLower(filepath.Ext(path))
+	return ext == ".mp4" || ext == ".webm" || ext == ".mov"
 }
 
 // TODO: to renderer

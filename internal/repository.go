@@ -14,6 +14,7 @@ import (
 
 const (
 	fileTypeImage = "image"
+	fileTypeVideo = "video"
 	fileTypeText  = "text"
 	fileTypeDir   = "directory"
 	fileTypeOther = "other"
@@ -175,6 +176,8 @@ func getFileType(filename string, info os.FileInfo) string {
 	switch ext {
 	case ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp":
 		return fileTypeImage
+	case ".mp4", ".webm", ".mov":
+		return fileTypeVideo
 	case ".txt", ".md", ".csv", ".json", ".xml", ".html", ".css", ".js":
 		return fileTypeText
 	default:
@@ -318,7 +321,7 @@ func findDirectoryCover(resourcePath, resourceFullPath string) string {
 
 		// Проверяем расширение
 		ext := filepath.Ext(fileName)
-		validExts := []string{".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
+		validExts := []string{".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".mp4", ".webm", ".mov"}
 
 		if slices.Contains(validExts, ext) {
 			return filepath.Join(resourcePath, MetaDirName, file.Name())

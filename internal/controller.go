@@ -176,6 +176,12 @@ func (controller *Controller) handleStaticRoute(
 		res.Header().Set("Content-Type", "image/jpeg")
 	case ".svg":
 		res.Header().Set("Content-Type", "image/svg+xml")
+	case ".mp4":
+		res.Header().Set("Content-Type", "video/mp4")
+	case ".webm":
+		res.Header().Set("Content-Type", "video/webm")
+	case ".mov":
+		res.Header().Set("Content-Type", "video/quicktime")
 	}
 
 	http.ServeFile(res, req, staticFileData.Path)

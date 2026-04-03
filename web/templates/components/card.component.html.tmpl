@@ -1,20 +1,28 @@
 {{ define "card" }}
   <a id="{{ .ID }}" class="card__wrapper border_light" href="/{{ .Path }}">
     {{ if .Cover }}
-      <picture class="card__cover-container">
-        <source
-          srcset="/{{ .Cover }}?static&width=360&height=214 1x, /{{ .Cover }}?static&width=720&height=428 2x"
-          media="(max-width: 360px)"
-        />
-        <source
-          srcset="/{{ .Cover }}?static&width=190&height=288 1x, /{{ .Cover }}?static&width=380&height=576 2x"
-        />
-        <img
-          src="/{{ .Cover }}?static&width=190&height=288"
-          class="card__img"
-          alt="page card cover"
-        />
-      </picture>
+      {{ if .CoverIsVideo }}
+        <video
+          class="card__cover-container card__img"
+          src="/{{ .Cover }}?static"
+          autoplay loop muted playsinline
+        ></video>
+      {{ else }}
+        <picture class="card__cover-container">
+          <source
+            srcset="/{{ .Cover }}?static&width=360&height=214 1x, /{{ .Cover }}?static&width=720&height=428 2x"
+            media="(max-width: 360px)"
+          />
+          <source
+            srcset="/{{ .Cover }}?static&width=190&height=288 1x, /{{ .Cover }}?static&width=380&height=576 2x"
+          />
+          <img
+            src="/{{ .Cover }}?static&width=190&height=288"
+            class="card__img"
+            alt="page card cover"
+          />
+        </picture>
+      {{ end }}
     {{ end }}
 
 
