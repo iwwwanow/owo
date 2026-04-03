@@ -78,3 +78,31 @@ curl https://your-host/backup -o backup.zip
 ```
 
 > Роут не защищён аутентификацией — если сервер публичный, закройте `/backup` на уровне nginx/reverse proxy.
+
+---
+
+## Очистка кэша изображений
+
+```
+POST /cache/clear
+```
+
+Удаляет всю директорию кэша (`/var/www/owo/cache`). Ресайз будет пересчитан при следующем запросе.
+
+- Возвращает `204 No Content` при успехе.
+
+```bash
+curl -X POST https://your-host/cache/clear
+```
+
+> Роут не защищён аутентификацией — закройте на уровне nginx/reverse proxy в продакшене.
+
+**Очистить вручную (без API):**
+
+```bash
+# через Dokku (на сервере)
+dokku run owo rm -rf /var/www/owo/cache
+
+# или напрямую на хосте
+rm -rf /home/dokku/owo/cache/*
+```

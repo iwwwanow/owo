@@ -32,6 +32,11 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 			return
 		}
 
+		if requestPath == "cache/clear" && req.Method == http.MethodPost {
+			controller.handleCacheClearRoute(res, req)
+			return
+		}
+
 		if req.URL.Query().Has("static") {
 			resolvedPath := ResolveTransliteratedPath(UploadsDir, requestPath)
 			width := req.URL.Query().Get("width")
@@ -137,6 +142,14 @@ func (controller *Controller) handleBackupRoute(res http.ResponseWriter, req *ht
 	if err != nil {
 		fmt.Printf("backup error: %v\n", err)
 	}
+}
+
+func (controller *Controller) handleCacheClearRoute(res http.ResponseWriter, req *http.Request) {
+	if err := os.RemoveAll(CacheDir); err != nil {
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	res.WriteHeader(http.StatusNoContent)
 }
 
 func (controller *Controller) handleStaticRoute(
