@@ -25,6 +25,7 @@ var templates = []string{
 	"/var/www/owo/templates/components/image.component.html.tmpl",
 	"/var/www/owo/templates/components/code.component.html.tmpl",
 	"/var/www/owo/templates/components/hr.component.html.tmpl",
+	"/var/www/owo/templates/components/video.component.html.tmpl",
 }
 
 func GetServerPort() int {
