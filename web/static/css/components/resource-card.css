@@ -34,11 +34,15 @@
 }
 
 .card__cover-container {
+  position: absolute;
   width: 100%;
+  height: 100%;
 }
 
 .card__img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .grid--hidden .card__wrapper {
@@ -56,10 +60,5 @@
 @media screen and (max-width: 360px) {
   .card__wrapper {
     height: 214px;
-  }
-  .card__img {
-    width: auto;
-    height: 100%;
-    object-fit: contain;
   }
 }
