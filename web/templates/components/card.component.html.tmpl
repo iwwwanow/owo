@@ -1,5 +1,8 @@
 {{ define "card" }}
   <a id="{{ .ID }}" class="card__wrapper border_light" href="/{{ .Path }}">
+    {{ if .IsDir }}
+      <h6 class="card__dir-badge">directory</h6>
+    {{ end }}
     {{ if .Cover }}
       {{ if .CoverIsVideo }}
         <video

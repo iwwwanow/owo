@@ -17,6 +17,7 @@ const (
 	fileTypeVideo = "video"
 	fileTypeText  = "text"
 	fileTypeDir   = "directory"
+	fileTypeLink  = "link"
 	fileTypeOther = "other"
 )
 
@@ -162,6 +163,20 @@ func (repository *Repository) SetChildResourcesData(
 			}
 		}
 
+		if childResourceData.Type == fileTypeLink {
+			content, err := os.ReadFile(childResourceData.FullPath)
+			if err == nil {
+				link := strings.TrimSpace(string(content))
+				childResourceData.LinkTarget = link
+				decoded, _ := url.PathUnescape(link)
+				actualPath := ResolveTransliteratedPath(UploadsDir, decoded)
+				var targetData ResourceData
+				repository.SetResourceData(actualPath, &targetData)
+				repository.SetResourceStaticData(&targetData, &targetData.Static)
+				childResourceData.Static.CoverPath = targetData.Static.CoverPath
+			}
+		}
+
 		*childResourcesData = append(*childResourcesData, childResourceData)
 	}
 }
@@ -180,6 +195,8 @@ func getFileType(filename string, info os.FileInfo) string {
 		return fileTypeVideo
 	case ".txt", ".md", ".csv", ".json", ".xml", ".html", ".css", ".js":
 		return fileTypeText
+	case ".link":
+		return fileTypeLink
 	default:
 		return fileTypeOther
 	}

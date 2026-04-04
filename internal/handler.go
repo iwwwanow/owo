@@ -107,10 +107,15 @@ func (handler *Handler) mapDataToProps(
 			var childResourceProps ChildResourceProps
 			childResourceProps.ID = "card-" + strings.NewReplacer("/", "-", " ", "-").Replace(transliteratePathSegments(childResourceData.Path))
 			childResourceProps.Path = transliteratePathSegments(childResourceData.Path)
-			childResourceProps.Title = childResourceData.Name
+			if childResourceData.Type == fileTypeLink {
+				childResourceProps.Title = strings.TrimSuffix(childResourceData.Name, ".link")
+			} else {
+				childResourceProps.Title = childResourceData.Name
+			}
 			childResourceProps.Description = childResourceData.Meta.Description
 			childResourceProps.Cover = transliteratePathSegments(childResourceData.Static.CoverPath)
 			childResourceProps.CoverIsVideo = isVideoExt(childResourceData.Static.CoverPath)
+			childResourceProps.IsDir = childResourceData.Type == fileTypeDir
 
 			switch {
 			case strings.HasPrefix(childResourceData.Name, "."):
@@ -133,10 +138,15 @@ func (handler *Handler) mapDataToProps(
 					var gcProps ChildResourceProps
 					gcProps.ID = "card-" + strings.NewReplacer("/", "-", " ", "-").Replace(transliteratePathSegments(gc.Path))
 					gcProps.Path = transliteratePathSegments(gc.Path)
-					gcProps.Title = gc.Name
+					if gc.Type == fileTypeLink {
+						gcProps.Title = strings.TrimSuffix(gc.Name, ".link")
+					} else {
+						gcProps.Title = gc.Name
+					}
 					gcProps.Description = gc.Meta.Description
 					gcProps.Cover = transliteratePathSegments(gc.Static.CoverPath)
 					gcProps.CoverIsVideo = isVideoExt(gc.Static.CoverPath)
+					gcProps.IsDir = gc.Type == fileTypeDir
 					section.Resources = append(section.Resources, gcProps)
 				}
 				props.Sections = append(props.Sections, section)

@@ -43,6 +43,7 @@ type ChildResourceProps struct {
 	Description  string
 	Cover        string
 	CoverIsVideo bool
+	IsDir        bool
 }
 
 type SectionProps struct {
