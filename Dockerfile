@@ -36,7 +36,8 @@ EXPOSE 22 8080
 
 ENV PORT=8080 \
 	TZ=Europe/Moscow \
-	PUBLIC_DIR=/var/www/owwo/shared
+	PUBLIC_DIR=/var/www/owwo/shared \
+	LANG=C.UTF-8
 
 # TODO: for what?
 # VOLUME ["/var/www/owo/shared"]
