@@ -110,6 +110,8 @@ func (repository *Repository) SetResourceStaticData(
 	// 	setResourceMetaDescription(resourceData, &resourceStaticData)
 	case fileTypeImage:
 		setImageStaticData(resourceData, resourceStaticData)
+	case fileTypeVideo:
+		setVideoStaticData(resourceData, resourceStaticData)
 	case fileTypeDir:
 		setDirectoryStaticData(resourceData, resourceStaticData)
 	default:
@@ -227,6 +229,10 @@ func setResourceMetaDescription(resourceData *ResourceData, meta *MetaData) {
 }
 
 func setImageStaticData(resourceData *ResourceData, static *StaticData) {
+	static.CoverPath = resourceData.Path
+}
+
+func setVideoStaticData(resourceData *ResourceData, static *StaticData) {
 	static.CoverPath = resourceData.Path
 }
 
