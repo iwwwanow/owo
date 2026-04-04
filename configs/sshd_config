@@ -10,3 +10,4 @@ X11Forwarding no
 PrintMotd no
 AcceptEnv LANG LC_*
 Subsystem sftp /usr/lib/ssh/sftp-server
+ForceCommand internal-sftp -d /var/www/owo/uploads
