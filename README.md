@@ -60,6 +60,43 @@ uploads/
         └── cover.jpg     # directory cover image
 ```
 
+## URL and query parameters
+
+| URL pattern | Description |
+|---|---|
+| `GET /{path}` | Render owo page for resource at path |
+| `GET /{path}?static` | Serve raw file from uploads (no page render) |
+| `GET /{path}?static&width=W` | Serve resized image (preserves aspect ratio) |
+| `GET /{path}?static&height=H` | Serve resized image (preserves aspect ratio) |
+| `GET /{path}?static&width=W&height=H` | Serve resized image (exact dimensions) |
+| `GET /backup` | Download zip archive of all uploads |
+| `POST /cache/clear` | Clear image resize cache |
+
+Resize cache is stored at `/var/www/owo/cache/{W}x{H}/{path}`. Supported formats: JPEG, PNG, GIF, BMP, WebP.
+
+```sh
+# examples
+GET /projects/cover.jpg?static
+GET /projects/cover.jpg?static&width=240&height=200
+GET /avatar.png?static&width=96
+```
+
+## .meta/ customization
+
+Each directory can override its page layout and behavior via a `.meta/` subfolder:
+
+| File | Description |
+|---|---|
+| `index.md` | Markdown description injected above the file grid |
+| `index.html` | Raw HTML injected into the page (iframe) |
+| `index.css` | Custom CSS loaded for this directory's page |
+| `index.js` | Custom JS loaded for this directory's page (deferred) |
+| `cover.jpg` / `cover.png` / etc. | Cover image shown on the parent directory's card |
+
+Scripts and styles are injected only on the directory's own page, not on parent pages.
+
+Inside `index.js`, card links are available as `a[href$=".mp4"]`, `a[href$=".png"]` etc. — append `?static` to the href to get the raw file URL.
+
 ## Development
 
 ```sh
