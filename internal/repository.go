@@ -85,6 +85,14 @@ func GetResourceLink(resourcePath string) string {
 	return strings.TrimSpace(string(content))
 }
 
+func GetFileLinkTarget(resourcePath string) string {
+	content, err := os.ReadFile(filepath.Join(UploadsDir, resourcePath))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(content))
+}
+
 func (repository *Repository) SetResourceData(resourcePath string, resourceData *ResourceData) {
 	// TODO: publicdirpath
 	resourceData.FullPath = filepath.Join(UploadsDir, resourcePath)

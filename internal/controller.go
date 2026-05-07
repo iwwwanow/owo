@@ -65,6 +65,17 @@ func (controller *Controller) ProcessRequest() http.HandlerFunc {
 			http.Redirect(res, req, "/"+transliteratePathSegments(decoded), http.StatusFound)
 			return
 		}
+		if strings.HasSuffix(resolvedPath, ".link") {
+			if linkTarget := GetFileLinkTarget(resolvedPath); linkTarget != "" {
+				decoded, _ := url.PathUnescape(linkTarget)
+				if strings.HasPrefix(decoded, "http://") || strings.HasPrefix(decoded, "https://") {
+					http.Redirect(res, req, decoded, http.StatusFound)
+				} else {
+					http.Redirect(res, req, "/"+transliteratePathSegments(decoded), http.StatusFound)
+				}
+				return
+			}
+		}
 		controller.handleResourceRoute(res, req, resolvedPath, hostName)
 	}
 }
