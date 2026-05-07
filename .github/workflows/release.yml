@@ -22,11 +22,11 @@ jobs:
       new_release_version: ${{ steps.semantic_release.outputs.new_release_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.3.1
         with:
           fetch-depth: 0
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: "lts/*"
       - name: Install dependencies
@@ -36,7 +36,7 @@ jobs:
       # Используем готовый action для semantic-release
       - name: Semantic Release
         id: semantic_release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@v4.2.2
         with:
           extra_plugins: |
             @semantic-release/commit-analyzer
@@ -55,7 +55,7 @@ jobs:
     if: needs.release.outputs.new_release_published != 'false'
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.3.1
       
       # Получаем тег ИЗ OUTPUT semantic-release (не из GITHUB_REF!)
       - name: Extract tag from semantic-release output
