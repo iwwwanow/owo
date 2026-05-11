@@ -1,3 +1,5 @@
+@import url("frames-script.style.css?static");
+
 /* span-2: 2 колонки */
 #card-0_way-to-the-temple-of-the-goddess-of-flowers {
   grid-column: span 2;
