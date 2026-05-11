@@ -10,6 +10,9 @@ if [ -f /root/.ssh/authorized_keys ]; then
     chmod 600 /root/.ssh/authorized_keys
 fi
 
+if ! ls /etc/ssh/ssh_host_*_key 2>/dev/null | grep -q .; then
+    ssh-keygen -A
+fi
 chmod 600 /etc/ssh/ssh_host_*_key 2>/dev/null || true
 chmod 644 /etc/ssh/ssh_host_*_key.pub 2>/dev/null || true
 
