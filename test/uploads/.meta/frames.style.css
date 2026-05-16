@@ -1,9 +1,50 @@
+/* span-4: 4 колонки */
+#grid-frames-script > .card__wrapper {
+  grid-column: span 4;
+}
+
+@media screen and (max-width: 1680px) {
+  #grid-frames-script > .card__wrapper {
+    grid-column: span 3;
+  }
+}
+
+@media screen and (max-width: 1268px) {
+  #grid-frames-script > .card__wrapper {
+    grid-column: span 4;
+  }
+}
+
+@media screen and (max-width: 858px) {
+  #grid-frames-script > .card__wrapper {
+    grid-column: span 3;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  #grid-frames-script > .card__wrapper {
+    grid-column: span 2;
+  }
+}
+
+@media screen and (max-width: 444px) {
+  #grid-frames-script > .card__wrapper {
+    grid-column: span 1;
+  }
+}
+
 .frame-wrapper {
   width: 100vw;
   height: 100vh;
-  background-color: grey;
+  grid-auto-rows: auto;
+  padding: 64px 0 64px;
+  /* background-color: grey; */
+  background-color: #ffffff99;
+  backdrop-filter: blur(4px);
   position: fixed;
   z-index: 3;
+  /* TODO: uncomment */
+  /* pointer-events: none; */
 }
 
 .frame-wrapper > .left-wrapper {
@@ -18,6 +59,23 @@
   min-height: 80px;
   width: 100%;
   grid-column: 5 / -1;
+}
+
+.right-wrapper,
+.left-wrapper {
+  height: auto;
+  position: relative;
+}
+
+.right-wrapper > .frame-image {
+  width: auto;
+  height: 100%;
+  position: absolute;
+  z-index: 4;
+}
+
+.right-wrapper > .source-image {
+  position: absolute;
 }
 
 @media screen and (max-width: 1680px) {
