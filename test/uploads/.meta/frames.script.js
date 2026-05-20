@@ -30,14 +30,17 @@ export const mouseLeaveHandler = (event) => {
 const drawFramesWrapperLayer = async (elementHref) => {
 	// TODO: get it from parent and cycle it
 	// const sourceImageLink = elementHref
-	const sourceImageLink = '/_frames-script/6104c2143578475.627cf80887bb9.png?static'
+	const sourceImageLink = '/_frames-script/frame-image-1/.meta/cover.png?static'
 	// TODO: how to be in other extentions? jpg, gif, webp?
-	const sourceJsonLink = sourceImageLink.replace('.png', '.json');
+	const sourceJsonLink = sourceImageLink.replace('cover.png', 'data.json');
 	console.log(sourceJsonLink)
 
 	const img = new Image();
 	img.src = new URL(FRAME_SRC, window.location.origin).href;
-	img.onload = () => {console.log(img.naturalWidth, img)}
+	img.onload = () => {
+		console.log(img.naturalWidth, img)
+		console.log(img.src.split('/').pop().split('?')[0])
+	}
 
 	const innerDimentions = 0
 	const outterDimentions = 0
