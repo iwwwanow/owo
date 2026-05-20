@@ -1,10 +1,8 @@
-const FRAME_SRC = '.meta/assets/frame-1.png?static'
+const FRAME_SRC = '.meta/assets/frame-1_245x347.png?static'
 
 export const makeFramesHover = (querySelector) => {
 	const gridNode = document.querySelector(querySelector)
-	console.log(gridNode)
 	const elementNodes = gridNode.querySelectorAll('a')
-	console.log(elementNodes)
 
 	elementNodes.forEach(element => {
 		element.addEventListener('mouseenter', mouseEnterHandler)
@@ -17,22 +15,32 @@ export const makeFramesHover = (querySelector) => {
 }
 
 export const mouseEnterHandler = (event) => {
-	// console.log(event)
-	drawFramesWrapperLayer()
+	const elementHref = event.srcElement.getAttribute('href')
+	drawFramesWrapperLayer(elementHref)
 }
 
 export const mouseLeaveHandler = (event) => {
 	// console.log(event)
 
 	const frameWrappers = document.querySelectorAll('.frame-wrapper')
-	console.log(frameWrappers)
 	frameWrappers.forEach(wrapper => wrapper.remove())
 	// TODO: disable scroll
 }
 
-const drawFramesWrapperLayer = () => {
+const drawFramesWrapperLayer = async (elementHref) => {
 	// TODO: get it from parent and cycle it
+	// const sourceImageLink = elementHref
 	const sourceImageLink = '/_frames-script/6104c2143578475.627cf80887bb9.png?static'
+	// TODO: how to be in other extentions? jpg, gif, webp?
+	const sourceJsonLink = sourceImageLink.replace('.png', '.json');
+	console.log(sourceJsonLink)
+
+	const img = new Image();
+	img.src = new URL(FRAME_SRC, window.location.origin).href;
+	img.onload = () => {console.log(img.naturalWidth, img)}
+
+	const innerDimentions = 0
+	const outterDimentions = 0
 
 	const frameWrapper = document.createElement('div')
 	const leftWrapper = document.createElement('div')
@@ -49,9 +57,13 @@ const drawFramesWrapperLayer = () => {
 	frameImage.classList.add('frame-image')
 	sourceImage.classList.add('source-image')
 
-	header1.innerText = 'Шаман'
-	header2.innerText = 'шаман 1.25x1.25 - акрил, осп-плита, лак'
-	header3.innerText = 'price'
+	const response = await fetch(sourceJsonLink)
+	const json = await response.json()
+	console.log(json)
+
+	header1.innerText = json.title
+	header2.innerText = json.description
+	header3.innerText = json.price
 	frameImage.src = FRAME_SRC;
 	sourceImage.src = sourceImageLink
 
