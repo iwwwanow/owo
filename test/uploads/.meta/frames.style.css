@@ -103,10 +103,18 @@
   }
 }
 
-@media screen and (max-width: 858px) {
+@media screen and (max-width: 650px) {
+  .frame-wrapper.grid {
+    grid-auto-rows: auto;
+    grid-template-rows: min-content;
+  }
+
+  .right-wraper {
+    height: 100%;
+  }
+
   .frame-wrapper > .left-wrapper {
     grid-column: 1 / -1;
-    max-height: 60%;
   }
 
   .frame-wrapper > .right-wrapper {
@@ -114,8 +122,8 @@
   }
 }
 
-@media screen and (max-width: 650px) {
-}
-
 @media screen and (max-width: 444px) {
+  .frame-wrapper.grid {
+    padding: 16px 16px;
+  }
 }

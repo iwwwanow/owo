@@ -59,7 +59,10 @@ const clearExistingFrames = () => {
 		clearInterval(_cycleIntervalId)
 		_cycleIntervalId = null
 	}
-	document.querySelectorAll('.frame-wrapper').forEach(el => el.remove())
+	document.querySelectorAll('.frame-wrapper').forEach(el => {
+		el._resizeObserver?.disconnect()
+		el.remove()
+	})
 }
 
 const drawFramesWrapperLayer = async (elementHref) => {
@@ -98,16 +101,27 @@ const drawFramesWrapperLayer = async (elementHref) => {
 
 	// object-fit: contain; object-position: left top — рамка вписывается в right-wrapper
 	// с сохранением пропорций, начиная с (0, 0). Считаем реальный rendered-размер:
-	const { width: rwWidth, height: rwHeight } = rightWrapper.getBoundingClientRect()
-	const scale = (rwWidth / rwHeight > naturalWidth / naturalHeight)
-		? rwHeight / naturalHeight  // ограничено по высоте
-		: rwWidth / naturalWidth    // ограничено по ширине
-	Object.assign(sourceImage.style, {
-		left: `${padH * scale}px`,
-		top: `${padV * scale}px`,
-		width: `${inner.w * scale}px`,
-		height: `${inner.h * scale}px`,
-	})
+	const applySourceImagePosition = () => {
+		const { width: rwWidth, height: rwHeight } = rightWrapper.getBoundingClientRect()
+		const scale = (rwWidth / rwHeight > naturalWidth / naturalHeight)
+			? rwHeight / naturalHeight  // ограничено по высоте
+			: rwWidth / naturalWidth    // ограничено по ширине
+		Object.assign(sourceImage.style, {
+			left: `${padH * scale}px`,
+			top: `${padV * scale}px`,
+			width: `${inner.w * scale}px`,
+			height: `${inner.h * scale}px`,
+		})
+	}
+
+	// Двойной rAF гарантирует, что браузер успел сделать layout
+	// и getBoundingClientRect() вернёт правильные размеры
+	await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+	applySourceImagePosition()
+
+	const resizeObserver = new ResizeObserver(applySourceImagePosition)
+	resizeObserver.observe(rightWrapper)
+	frameWrapper._resizeObserver = resizeObserver
 
 	if (elementHref) {
 		try {
