@@ -84,7 +84,7 @@ const drawFramesWrapperLayer = async (elementHref) => {
 	const sourceImage = document.createElement('img')
 	const h1 = document.createElement('h1')
 	const h2 = document.createElement('h2')
-	const h3 = document.createElement('h3')
+	const p = document.createElement('p')
 
 	frameWrapper.classList.add('frame-wrapper', 'grid')
 	leftWrapper.classList.add('left-wrapper')
@@ -96,7 +96,7 @@ const drawFramesWrapperLayer = async (elementHref) => {
 
 	document.body.prepend(frameWrapper)
 	frameWrapper.append(leftWrapper, rightWrapper)
-	leftWrapper.append(h1, h2, h3)
+	leftWrapper.append(h2, h1, p)
 	rightWrapper.append(frameImage, sourceImage)
 
 	// object-fit: contain; object-position: left top — рамка вписывается в right-wrapper
@@ -128,9 +128,9 @@ const drawFramesWrapperLayer = async (elementHref) => {
 			const jsonRes = await fetch(elementHref + '/.meta/data.json?static')
 			if (jsonRes.ok) {
 				const json = await jsonRes.json()
-				h1.innerText = json.title ?? ''
-				h2.innerText = json.description ?? ''
-				h3.innerText = json.price ?? ''
+				h2.innerText = json.title ?? ''
+				h1.innerText = `${json.price}₽` ?? ''
+				p.innerText = json.description ?? ''
 			}
 		} catch {}
 	}

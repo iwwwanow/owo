@@ -38,7 +38,7 @@
   height: 100vh;
   padding: 64px 0 64px;
   background-color: #ffffff99;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
   position: fixed;
   top: 0;
   left: 0;
@@ -58,6 +58,22 @@
   min-height: 80px;
   width: 100%;
   grid-column: 1 / 5;
+}
+
+.left-wrapper > * {
+  font-style: normal;
+}
+
+.left-wrapper > h2 {
+  color: var(--MEDIUM);
+}
+
+.left-wrapper > h1 {
+  color: var(--DARK);
+}
+
+.left-wrapper > p {
+  color: var(--MEDIUM);
 }
 
 .frame-wrapper > .right-wrapper {
