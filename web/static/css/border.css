@@ -23,7 +23,7 @@
 .border_dashed {
   outline: 0;
   border-width: 1px;
-  border-style: solid;
+  border-style: dashed;
   border-color: var(--LIGHT);
 }
 

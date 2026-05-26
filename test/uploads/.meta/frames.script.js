@@ -1,15 +1,21 @@
+// TODO: рама под размер фрейма. можно её просто подрезать в промежутке. грубо
 // TODO: поправить мобильные разрешения
 // TODO: добавить задержку и плавность
 // TODO: подумать, как это будет работать на мобильных
 
 const FRAME_SRC = '.meta/assets/frame-1_245x347.png?static'
 const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i
-const CYCLE_INTERVAL_MS = 2000
+const CYCLE_INTERVAL_MS = 1500
 
 // DEBUG: раскомментируй чтобы тестировать рамку без hover
-const DEBUG_HREF = '/_frames-script/frame-image-1'
+// const DEBUG_HREF = '/_frames-script/frame-image-1'
+
+const HOVER_DELAY_MS = 450
+
+const getScrollbarWidth = () => window.innerWidth - document.documentElement.clientWidth
 
 let _cycleIntervalId = null
+let _hoverTimeoutId = null
 
 const loadImage = (src) => new Promise((resolve, reject) => {
 	const img = new Image()
@@ -43,25 +49,48 @@ export const makeFramesHover = (querySelector) => {
 	})
 
 	// DEBUG: использует DEBUG_HREF если раскомментирована выше
-	drawFramesWrapperLayer(typeof DEBUG_HREF !== 'undefined' ? DEBUG_HREF : undefined)
+	if (typeof DEBUG_HREF !== 'undefined') drawFramesWrapperLayer(DEBUG_HREF)
 }
 
 export const mouseEnterHandler = (event) => {
-	drawFramesWrapperLayer(event.srcElement.getAttribute('href'))
+	const href = event.srcElement.getAttribute('href')
+	clearTimeout(_hoverTimeoutId)
+	_hoverTimeoutId = setTimeout(() => drawFramesWrapperLayer(href), HOVER_DELAY_MS)
 }
 
 export const mouseLeaveHandler = () => {
-	clearExistingFrames()
+	clearTimeout(_hoverTimeoutId)
+	_hoverTimeoutId = null
+	clearExistingFrames({ unlock: true })
 }
 
-const clearExistingFrames = () => {
+const lockScroll = () => {
+	if (document.body.style.overflow === 'hidden') return
+	document.body.style.paddingRight = `${getScrollbarWidth()}px`
+	document.body.style.overflow = 'hidden'
+}
+
+const unlockScroll = () => {
+	document.body.style.overflow = ''
+	document.body.style.paddingRight = ''
+}
+
+const clearExistingFrames = ({ unlock = false } = {}) => {
+	if (_hoverTimeoutId !== null) {
+		clearTimeout(_hoverTimeoutId)
+		_hoverTimeoutId = null
+	}
 	if (_cycleIntervalId !== null) {
 		clearInterval(_cycleIntervalId)
 		_cycleIntervalId = null
 	}
 	document.querySelectorAll('.frame-wrapper').forEach(el => {
 		el._resizeObserver?.disconnect()
-		el.remove()
+		el.classList.remove('visible')
+		el.addEventListener('transitionend', () => {
+			el.remove()
+			if (unlock && !document.querySelector('.frame-wrapper')) unlockScroll()
+		}, { once: true })
 	})
 }
 
@@ -95,6 +124,8 @@ const drawFramesWrapperLayer = async (elementHref) => {
 	frameImage.src = new URL(FRAME_SRC, window.location.origin).href
 
 	document.body.prepend(frameWrapper)
+	lockScroll()
+	requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
 	frameWrapper.append(leftWrapper, rightWrapper)
 	leftWrapper.append(h2, h1, p)
 	rightWrapper.append(frameImage, sourceImage)
@@ -143,8 +174,12 @@ const drawFramesWrapperLayer = async (elementHref) => {
 				if (images.length > 1) {
 					let idx = 0
 					_cycleIntervalId = setInterval(() => {
-						idx = (idx + 1) % images.length
-						sourceImage.src = images[idx]
+						sourceImage.style.opacity = '0'
+						sourceImage.addEventListener('transitionend', () => {
+							idx = (idx + 1) % images.length
+							sourceImage.src = images[idx]
+							sourceImage.style.opacity = '1'
+						}, { once: true })
 					}, CYCLE_INTERVAL_MS)
 				}
 			}
