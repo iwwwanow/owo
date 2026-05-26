@@ -61,7 +61,8 @@ export const mouseEnterHandler = (event) => {
 export const mouseLeaveHandler = () => {
 	clearTimeout(_hoverTimeoutId)
 	_hoverTimeoutId = null
-	clearExistingFrames({ unlock: true })
+	unlockScroll()
+	clearExistingFrames()
 }
 
 const lockScroll = () => {
@@ -75,7 +76,7 @@ const unlockScroll = () => {
 	document.body.style.paddingRight = ''
 }
 
-const clearExistingFrames = ({ unlock = false } = {}) => {
+const clearExistingFrames = () => {
 	if (_hoverTimeoutId !== null) {
 		clearTimeout(_hoverTimeoutId)
 		_hoverTimeoutId = null
@@ -87,10 +88,7 @@ const clearExistingFrames = ({ unlock = false } = {}) => {
 	document.querySelectorAll('.frame-wrapper').forEach(el => {
 		el._resizeObserver?.disconnect()
 		el.classList.remove('visible')
-		el.addEventListener('transitionend', () => {
-			el.remove()
-			if (unlock && !document.querySelector('.frame-wrapper')) unlockScroll()
-		}, { once: true })
+		el.addEventListener('transitionend', () => el.remove(), { once: true })
 	})
 }
 
