@@ -5,7 +5,7 @@
 
 const FRAME_SRC = '.meta/assets/frame-1_245x347.png?static'
 const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i
-const CYCLE_INTERVAL_MS = 2000
+const CYCLE_INTERVAL_MS = 1500
 
 // DEBUG: раскомментируй чтобы тестировать рамку без hover
 // const DEBUG_HREF = '/_frames-script/frame-image-1'
@@ -76,7 +76,7 @@ const clearExistingFrames = () => {
 	document.querySelectorAll('.frame-wrapper').forEach(el => {
 		el._resizeObserver?.disconnect()
 		el.classList.remove('visible')
-		el.addEventListener('transitionend', () => el.remove(), { once: true })
+		el.addEventListener('transitionend', (e) => { if (e.target === el) el.remove() })
 	})
 }
 
