@@ -5,14 +5,12 @@
 
 const FRAME_SRC = '.meta/assets/frame-1_245x347.png?static'
 const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i
-const CYCLE_INTERVAL_MS = 1500
+const CYCLE_INTERVAL_MS = 2000
 
 // DEBUG: раскомментируй чтобы тестировать рамку без hover
 // const DEBUG_HREF = '/_frames-script/frame-image-1'
 
-const HOVER_DELAY_MS = 450
-
-const getScrollbarWidth = () => window.innerWidth - document.documentElement.clientWidth
+const HOVER_DELAY_MS = 250
 
 let _cycleIntervalId = null
 let _hoverTimeoutId = null
@@ -48,6 +46,8 @@ export const makeFramesHover = (querySelector) => {
 		el.addEventListener('mouseleave', mouseLeaveHandler)
 	})
 
+	window.addEventListener('scroll', clearExistingFrames, { passive: true })
+
 	// DEBUG: использует DEBUG_HREF если раскомментирована выше
 	if (typeof DEBUG_HREF !== 'undefined') drawFramesWrapperLayer(DEBUG_HREF)
 }
@@ -61,19 +61,7 @@ export const mouseEnterHandler = (event) => {
 export const mouseLeaveHandler = () => {
 	clearTimeout(_hoverTimeoutId)
 	_hoverTimeoutId = null
-	unlockScroll()
 	clearExistingFrames()
-}
-
-const lockScroll = () => {
-	if (document.body.style.overflow === 'hidden') return
-	document.body.style.paddingRight = `${getScrollbarWidth()}px`
-	document.body.style.overflow = 'hidden'
-}
-
-const unlockScroll = () => {
-	document.body.style.overflow = ''
-	document.body.style.paddingRight = ''
 }
 
 const clearExistingFrames = () => {
@@ -122,7 +110,6 @@ const drawFramesWrapperLayer = async (elementHref) => {
 	frameImage.src = new URL(FRAME_SRC, window.location.origin).href
 
 	document.body.prepend(frameWrapper)
-	lockScroll()
 	requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
 	frameWrapper.append(leftWrapper, rightWrapper)
 	leftWrapper.append(h2, h1, p)
