@@ -118,11 +118,11 @@
 
 @media screen and (max-width: 1268px) {
   .frame-wrapper > .left-wrapper {
-    grid-column: 1 / 3;
+    grid-column: 1 / 2;
   }
 
   .frame-wrapper > .right-wrapper {
-    grid-column: 3 / -1;
+    grid-column: 2 / -1;
   }
 }
 
@@ -149,4 +149,28 @@
   .frame-wrapper.grid {
     padding: 16px 16px;
   }
+}
+
+/* Touch mode */
+.frame-wrapper.touch-mode {
+  pointer-events: auto;
+  grid-template-rows: min-content 1fr;
+}
+
+.frame-top-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+}
+
+.frame-top-bar a {
+  color: var(--RED);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.frame-top-bar a:first-child {
+  color: var(--BLUE);
 }

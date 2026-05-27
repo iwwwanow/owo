@@ -1,7 +1,4 @@
 // TODO: рама под размер фрейма. можно её просто подрезать в промежутке. грубо
-// TODO: поправить мобильные разрешения
-// TODO: добавить задержку и плавность
-// TODO: подумать, как это будет работать на мобильных
 
 const FRAME_SRC = '.meta/assets/frame-1_245x347.png?static'
 const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i
@@ -14,6 +11,8 @@ const HOVER_DELAY_MS = 250
 
 let _cycleIntervalId = null
 let _hoverTimeoutId = null
+let _touchStartX = 0
+let _touchStartY = 0
 
 const loadImage = (src) => new Promise((resolve, reject) => {
 	const img = new Image()
@@ -44,6 +43,8 @@ export const makeFramesHover = (querySelector) => {
 	gridNode.querySelectorAll('a').forEach(el => {
 		el.addEventListener('mouseenter', mouseEnterHandler)
 		el.addEventListener('mouseleave', mouseLeaveHandler)
+		el.addEventListener('touchstart', touchStartHandler, { passive: true })
+		el.addEventListener('touchend', touchEndHandler)
 	})
 
 	window.addEventListener('scroll', clearExistingFrames, { passive: true })
@@ -56,6 +57,21 @@ export const mouseEnterHandler = (event) => {
 	const href = event.srcElement.getAttribute('href')
 	clearTimeout(_hoverTimeoutId)
 	_hoverTimeoutId = setTimeout(() => drawFramesWrapperLayer(href), HOVER_DELAY_MS)
+}
+
+export const touchStartHandler = (event) => {
+	_touchStartX = event.touches[0].clientX
+	_touchStartY = event.touches[0].clientY
+}
+
+export const touchEndHandler = (event) => {
+	const dx = Math.abs(event.changedTouches[0].clientX - _touchStartX)
+	const dy = Math.abs(event.changedTouches[0].clientY - _touchStartY)
+	if (dx > 10 || dy > 10) return
+	event.preventDefault()
+	const href = event.currentTarget.getAttribute('href')
+	clearExistingFrames()
+	drawFramesWrapperLayer(href, true)
 }
 
 export const mouseLeaveHandler = () => {
@@ -80,7 +96,7 @@ const clearExistingFrames = () => {
 	})
 }
 
-const drawFramesWrapperLayer = async (elementHref) => {
+const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	clearExistingFrames()
 
 	const frameImg = await loadImage(FRAME_SRC)
@@ -111,7 +127,23 @@ const drawFramesWrapperLayer = async (elementHref) => {
 
 	document.body.prepend(frameWrapper)
 	requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
-	frameWrapper.append(leftWrapper, rightWrapper)
+
+	if (isTouchMode) {
+		frameWrapper.classList.add('touch-mode')
+		const topBar = document.createElement('div')
+		const goLink = document.createElement('a')
+		const closeLink = document.createElement('a')
+		topBar.classList.add('frame-top-bar')
+		goLink.textContent = 'ПЕРЕЙТИ'
+		goLink.href = elementHref
+		closeLink.textContent = 'ЗАКРЫТЬ'
+		closeLink.addEventListener('click', (e) => { e.preventDefault(); clearExistingFrames() })
+		topBar.append(goLink, closeLink)
+		frameWrapper.append(topBar, leftWrapper, rightWrapper)
+	} else {
+		frameWrapper.append(leftWrapper, rightWrapper)
+	}
+
 	leftWrapper.append(h2, h1, p)
 	rightWrapper.append(frameImage, sourceImage)
 
