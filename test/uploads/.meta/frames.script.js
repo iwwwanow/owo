@@ -1,6 +1,5 @@
-// TODO: рама под размер фрейма. можно её просто подрезать в промежутке. грубо
-
-const FRAME_SRC = '.meta/assets/frame-1_245x347.png?static'
+const FRAME_ASSETS_HREF = '/.meta/assets'
+const FRAME_NAME_PATTERN = /^frame-.+_\d+x\d+\.(png|jpg|jpeg|webp)$/i
 const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i
 const CYCLE_INTERVAL_MS = 1500
 
@@ -13,6 +12,7 @@ let _cycleIntervalId = null
 let _hoverTimeoutId = null
 let _touchStartX = 0
 let _touchStartY = 0
+let _frameHrefs = null
 
 const loadImage = (src) => new Promise((resolve, reject) => {
 	const img = new Image()
@@ -28,6 +28,24 @@ const parseInnerDimensions = (src) => {
 	return { w: parseInt(match[1]), h: parseInt(match[2]) }
 }
 
+const loadFrameHrefs = async () => {
+	if (_frameHrefs !== null) return _frameHrefs
+	const res = await fetch(FRAME_ASSETS_HREF)
+	const text = await res.text()
+	const doc = new DOMParser().parseFromString(text, 'text/html')
+	_frameHrefs = Array.from(doc.querySelectorAll('a.card__wrapper'))
+		.map(a => a.getAttribute('href'))
+		.filter(href => FRAME_NAME_PATTERN.test(href.split('/').pop()))
+	return _frameHrefs
+}
+
+const getRandomFrameSrc = async () => {
+	const hrefs = await loadFrameHrefs()
+	if (hrefs.length === 0) return null
+	const href = hrefs[Math.floor(Math.random() * hrefs.length)]
+	return href + '?static'
+}
+
 const getDirectoryImages = async (href) => {
 	const res = await fetch(href)
 	const text = await res.text()
@@ -35,7 +53,6 @@ const getDirectoryImages = async (href) => {
 	return Array.from(doc.querySelectorAll('a.card__wrapper'))
 		.map(a => a.getAttribute('href'))
 		.filter(href => IMAGE_EXTS.test(href))
-		.map(href => href + '?static')
 }
 
 export const makeFramesHover = (querySelector) => {
@@ -99,10 +116,13 @@ const clearExistingFrames = () => {
 const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	clearExistingFrames()
 
-	const frameImg = await loadImage(FRAME_SRC)
+	const frameSrc = await getRandomFrameSrc()
+	if (!frameSrc) return
+
+	const frameImg = await loadImage(frameSrc)
 	const { naturalWidth, naturalHeight } = frameImg
 
-	const inner = parseInnerDimensions(FRAME_SRC)
+	const inner = parseInnerDimensions(frameSrc)
 	if (!inner) return
 
 	const padH = (naturalWidth - inner.w) / 2
@@ -123,7 +143,7 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	frameImage.classList.add('frame-image')
 	sourceImage.classList.add('source-image')
 
-	frameImage.src = new URL(FRAME_SRC, window.location.origin).href
+	frameImage.src = new URL(frameSrc, window.location.origin).href
 
 	document.body.prepend(frameWrapper)
 	requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
@@ -133,10 +153,14 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 		const topBar = document.createElement('div')
 		const goLink = document.createElement('a')
 		const closeLink = document.createElement('a')
+		const goLabel = document.createElement('h5')
+		const closeLabel = document.createElement('h5')
 		topBar.classList.add('frame-top-bar')
-		goLink.textContent = 'ПЕРЕЙТИ'
+		goLabel.textContent = 'ПЕРЕЙТИ'
+		closeLabel.textContent = 'ЗАКРЫТЬ'
 		goLink.href = elementHref
-		closeLink.textContent = 'ЗАКРЫТЬ'
+		goLink.append(goLabel)
+		closeLink.append(closeLabel)
 		closeLink.addEventListener('click', (e) => { e.preventDefault(); clearExistingFrames() })
 		topBar.append(goLink, closeLink)
 		frameWrapper.append(topBar, leftWrapper, rightWrapper)
@@ -154,11 +178,12 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 		const scale = (rwWidth / rwHeight > naturalWidth / naturalHeight)
 			? rwHeight / naturalHeight  // ограничено по высоте
 			: rwWidth / naturalWidth    // ограничено по ширине
+		const bleed = 8
 		Object.assign(sourceImage.style, {
-			left: `${padH * scale}px`,
-			top: `${padV * scale}px`,
-			width: `${inner.w * scale}px`,
-			height: `${inner.h * scale}px`,
+			left: `${padH * scale - bleed}px`,
+			top: `${padV * scale - bleed}px`,
+			width: `${inner.w * scale + bleed * 2}px`,
+			height: `${inner.h * scale + bleed * 2}px`,
 		})
 	}
 
@@ -166,6 +191,12 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	// и getBoundingClientRect() вернёт правильные размеры
 	await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 	applySourceImagePosition()
+
+	// Реальный CSS-размер sourceImage после layout (inner.w/h * renderScale)
+	const displayW = parseFloat(sourceImage.style.width)
+	const displayH = parseFloat(sourceImage.style.height)
+	const imageSrc = (href, dpr = 1) =>
+		`${href}?static&width=${Math.round(displayW * dpr)}&height=${Math.round(displayH * dpr)}`
 
 	const resizeObserver = new ResizeObserver(applySourceImagePosition)
 	resizeObserver.observe(rightWrapper)
@@ -187,14 +218,19 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 		try {
 			const images = await getDirectoryImages(elementHref)
 			if (images.length > 0) {
-				sourceImage.src = images[0]
+				const dpr = Math.min(Math.ceil(window.devicePixelRatio || 1), 2)
+				await Promise.all(images.map(href => loadImage(imageSrc(href, dpr))))
+
+				sourceImage.src = imageSrc(images[0])
+				sourceImage.srcset = `${imageSrc(images[0], 2)} 2x`
 				if (images.length > 1) {
 					let idx = 0
 					_cycleIntervalId = setInterval(() => {
 						sourceImage.style.opacity = '0'
 						sourceImage.addEventListener('transitionend', () => {
 							idx = (idx + 1) % images.length
-							sourceImage.src = images[idx]
+							sourceImage.src = imageSrc(images[idx])
+							sourceImage.srcset = `${imageSrc(images[idx], 2)} 2x`
 							sourceImage.style.opacity = '1'
 						}, { once: true })
 					}, CYCLE_INTERVAL_MS)
