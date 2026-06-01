@@ -1,10 +1,10 @@
 const FRAME_ASSETS_HREF = '/.meta/assets'
 const FRAME_NAME_PATTERN = /^frame-.+_\d+x\d+\.(png|jpg|jpeg|webp)$/i
 const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i
-const CYCLE_INTERVAL_MS = 1500
+const CYCLE_INTERVAL_MS = 2000
 
 // DEBUG: раскомментируй чтобы тестировать рамку без hover
-// const DEBUG_HREF = '/_frames-script/frame-image-1'
+const DEBUG_HREF = '/_frames-script/frame-image-1'
 
 const HOVER_DELAY_MS = 250
 
@@ -56,6 +56,12 @@ const getDirectoryImages = async (href) => {
 }
 
 export const makeFramesHover = (querySelector) => {
+	// DEBUG: в режиме отладки не вешаем листенеры — рама остаётся активной
+	if (typeof DEBUG_HREF !== 'undefined') {
+		drawFramesWrapperLayer(DEBUG_HREF)
+		return
+	}
+
 	const gridNode = document.querySelector(querySelector)
 	gridNode.querySelectorAll('a').forEach(el => {
 		el.addEventListener('mouseenter', mouseEnterHandler)
@@ -65,9 +71,6 @@ export const makeFramesHover = (querySelector) => {
 	})
 
 	window.addEventListener('scroll', clearExistingFrames, { passive: true })
-
-	// DEBUG: использует DEBUG_HREF если раскомментирована выше
-	if (typeof DEBUG_HREF !== 'undefined') drawFramesWrapperLayer(DEBUG_HREF)
 }
 
 export const mouseEnterHandler = (event) => {
@@ -133,6 +136,7 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	const rightWrapper = document.createElement('div')
 	const frameImage = document.createElement('img')
 	const sourceImage = document.createElement('img')
+	const sourceImageAlt = document.createElement('img')
 	const h1 = document.createElement('h1')
 	const h2 = document.createElement('h2')
 	const p = document.createElement('p')
@@ -142,6 +146,8 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	rightWrapper.classList.add('right-wrapper')
 	frameImage.classList.add('frame-image')
 	sourceImage.classList.add('source-image')
+	sourceImageAlt.classList.add('source-image')
+	sourceImageAlt.style.opacity = '0'
 
 	frameImage.src = new URL(frameSrc, window.location.origin).href
 
@@ -169,7 +175,7 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	}
 
 	leftWrapper.append(h2, h1, p)
-	rightWrapper.append(frameImage, sourceImage)
+	rightWrapper.append(frameImage, sourceImageAlt, sourceImage)
 
 	// object-fit: contain; object-position: left top — рамка вписывается в right-wrapper
 	// с сохранением пропорций, начиная с (0, 0). Считаем реальный rendered-размер:
@@ -179,12 +185,14 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 			? rwHeight / naturalHeight  // ограничено по высоте
 			: rwWidth / naturalWidth    // ограничено по ширине
 		const bleed = 8
-		Object.assign(sourceImage.style, {
+		const pos = {
 			left: `${padH * scale - bleed}px`,
 			top: `${padV * scale - bleed}px`,
 			width: `${inner.w * scale + bleed * 2}px`,
 			height: `${inner.h * scale + bleed * 2}px`,
-		})
+		}
+		Object.assign(sourceImage.style, pos)
+		Object.assign(sourceImageAlt.style, pos)
 	}
 
 	// Двойной rAF гарантирует, что браузер успел сделать layout
@@ -192,9 +200,9 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 	applySourceImagePosition()
 
-	// Реальный CSS-размер sourceImage после layout (inner.w/h * renderScale)
-	const displayW = parseFloat(sourceImage.style.width)
-	const displayH = parseFloat(sourceImage.style.height)
+	// Размер rightWrapper — одинаков для всех рам при одном viewport,
+	// не зависит от конкретной рамы и гарантированно ненулевой после layout
+	const { width: displayW, height: displayH } = rightWrapper.getBoundingClientRect()
 	const imageSrc = (href, dpr = 1) =>
 		`${href}?static&width=${Math.round(displayW * dpr)}&height=${Math.round(displayH * dpr)}`
 
@@ -225,14 +233,15 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 				sourceImage.srcset = `${imageSrc(images[0], 2)} 2x`
 				if (images.length > 1) {
 					let idx = 0
+					let front = sourceImage
+					let back = sourceImageAlt
 					_cycleIntervalId = setInterval(() => {
-						sourceImage.style.opacity = '0'
-						sourceImage.addEventListener('transitionend', () => {
-							idx = (idx + 1) % images.length
-							sourceImage.src = imageSrc(images[idx])
-							sourceImage.srcset = `${imageSrc(images[idx], 2)} 2x`
-							sourceImage.style.opacity = '1'
-						}, { once: true })
+						idx = (idx + 1) % images.length
+						back.src = imageSrc(images[idx])
+						back.srcset = `${imageSrc(images[idx], 2)} 2x`
+						back.style.opacity = '1'
+						front.style.opacity = '0'
+						;[front, back] = [back, front]
 					}, CYCLE_INTERVAL_MS)
 				}
 			}

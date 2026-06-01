@@ -63,7 +63,7 @@
 .frame-wrapper > .left-wrapper {
   min-height: 80px;
   width: 100%;
-  grid-column: 1 / 5;
+  grid-column: 1 / 4;
 }
 
 .left-wrapper > * {
@@ -84,7 +84,7 @@
 
 .frame-wrapper > .right-wrapper {
   width: 100%;
-  grid-column: 5 / -1;
+  grid-column: 4 / -1;
   position: relative;
   height: 100%;
   overflow: hidden;
