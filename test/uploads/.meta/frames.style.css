@@ -131,15 +131,17 @@
 
 @media screen and (max-width: 650px) {
   .frame-wrapper.grid {
-    grid-template-rows: min-content;
-  }
-
-  .right-wraper {
-    height: 100%;
+    grid-template-rows: 35vh 1fr;
   }
 
   .frame-wrapper > .left-wrapper {
     grid-column: 1 / -1;
+    column-width: 180px;
+    column-fill: auto;
+    height: 35vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+    pointer-events: auto;
   }
 
   .frame-wrapper > .right-wrapper {
@@ -156,7 +158,7 @@
 /* Touch mode */
 .frame-wrapper.touch-mode {
   pointer-events: auto;
-  grid-template-rows: min-content;
+  grid-template-rows: min-content 35vh 1fr;
 }
 
 .frame-top-bar {
