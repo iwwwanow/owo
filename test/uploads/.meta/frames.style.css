@@ -79,7 +79,7 @@
 }
 
 .left-wrapper > p {
-  color: var(--MEDIUM);
+  color: var(--DARK);
 }
 
 .frame-wrapper > .right-wrapper {
@@ -131,7 +131,6 @@
 
 @media screen and (max-width: 650px) {
   .frame-wrapper.grid {
-    grid-auto-rows: auto;
     grid-template-rows: min-content;
   }
 
@@ -157,7 +156,7 @@
 /* Touch mode */
 .frame-wrapper.touch-mode {
   pointer-events: auto;
-  grid-template-rows: min-content 1fr;
+  grid-template-rows: min-content;
 }
 
 .frame-top-bar {
