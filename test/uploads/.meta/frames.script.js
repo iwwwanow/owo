@@ -4,7 +4,7 @@ const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i
 const CYCLE_INTERVAL_MS = 2000
 
 // DEBUG: раскомментируй чтобы тестировать рамку без hover
-const DEBUG_HREF = '/_frames-script/frame-image-1'
+// const DEBUG_HREF = '/_frames-script/frame-image-1'
 
 const HOVER_DELAY_MS = 250
 
@@ -152,7 +152,6 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 	frameImage.src = new URL(frameSrc, window.location.origin).href
 
 	document.body.prepend(frameWrapper)
-	requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
 
 	if (isTouchMode) {
 		frameWrapper.classList.add('touch-mode')
@@ -231,6 +230,7 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 
 				sourceImage.src = imageSrc(images[0])
 				sourceImage.srcset = `${imageSrc(images[0], 2)} 2x`
+				requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
 				if (images.length > 1) {
 					let idx = 0
 					let front = sourceImage
@@ -244,7 +244,11 @@ const drawFramesWrapperLayer = async (elementHref, isTouchMode = false) => {
 						;[front, back] = [back, front]
 					}, CYCLE_INTERVAL_MS)
 				}
+			} else {
+				requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
 			}
-		} catch {}
+		} catch {
+			requestAnimationFrame(() => requestAnimationFrame(() => frameWrapper.classList.add('visible')))
+		}
 	}
 }
