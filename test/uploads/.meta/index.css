@@ -1,4 +1,5 @@
 @import url("frames.style.css?static");
+@import url("additional-content.style.css?static");
 
 #card-0_way-to-the-temple-of-the-goddess-of-flowers {
   grid-column: span 2;

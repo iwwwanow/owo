@@ -1,0 +1,34 @@
+/* span-4: 4 колонки */
+#grid-frames-script-2 > .card__wrapper {
+  grid-column: span 4;
+}
+
+@media screen and (max-width: 1680px) {
+  #grid-frames-script-2 > .card__wrapper {
+    grid-column: span 3;
+  }
+}
+
+@media screen and (max-width: 1268px) {
+  #grid-frames-script-2 > .card__wrapper {
+    grid-column: span 4;
+  }
+}
+
+@media screen and (max-width: 858px) {
+  #grid-frames-script-2 > .card__wrapper {
+    grid-column: span 3;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  #grid-frames-script-2 > .card__wrapper {
+    grid-column: span 2;
+  }
+}
+
+@media screen and (max-width: 444px) {
+  #grid-frames-script-2 > .card__wrapper {
+    grid-column: span 1;
+  }
+}
