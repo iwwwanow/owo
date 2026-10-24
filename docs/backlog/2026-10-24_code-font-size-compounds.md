@@ -6,4 +6,4 @@
 
 Связанные заметки про шрифты: `2026-10-24_roboto-mono-not-loaded.md`, `2026-10-24_roboto-imported-unused.md`.
 
-В iwwwanow_ui-kit это расхождение уже поправлено в блоке «deviations» в конце `owo.css`.
+В uiu (iwwwanow/uiu) это расхождение уже поправлено в блоке «deviations» в конце `owo.css`.
